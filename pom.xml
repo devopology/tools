@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.devopology.tools</groupId>
-    <artifactId>toolset</artifactId>
+    <groupId>org.devopology</groupId>
+    <artifactId>tools-toolset</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
-    <name>toolset</name>
-    <description>toolset</description>
+    <name>tools-toolset</name>
+    <description>tools-toolset</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -50,7 +50,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.4.1</version>
                 <configuration>
-                    <finalName>org.devopology.tools.toolset-${project.version}</finalName>
+                    <finalName>${project.groupId}.${project.artifactId}-${project.version}</finalName>
                     <descriptors>
                         <descriptor>src/main/assembly/assembly.xml</descriptor>
                     </descriptors>
