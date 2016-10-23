@@ -12,7 +12,7 @@ Over the course of ~20 years, dealing with various Java software applications, J
 
 1. Dev-ops scripts should be easy to implement and provide extensible functionality
 2. Typical scripting languages used in dev-ops just obfuscate a lot of functionality
-3. Typical Scripting languages used in dev-ops require yet more knowledge
+3. Typical scripting languages used in dev-ops require yet more knowledge
 3. Java code (for a Java shop) is easy to develop, debug, deploy, etc.
 
 With those "truths" (... at least in my mind ...) I set out to develop code to wrap a lot of common
