@@ -55,7 +55,7 @@ To build ..
 
 1. Setup a Java 1.8 JDK
 2. Setup Maven
-3. Clone the GIT respository
+3. Clone the GIT repository
 4. Build the code using "mvn install"
 
 # Using
