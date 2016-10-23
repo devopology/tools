@@ -1,4 +1,4 @@
-![devOPology](https://raw.githubusercontent.com/devopology/tools/develop/devOPology.png)]
+![devOPology](https://raw.githubusercontent.com/devopology/tools/develop/devopology.png)]
 
 Code to script dev-op tasks written in Java
 
