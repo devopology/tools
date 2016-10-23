@@ -12,8 +12,13 @@ public class Example2 extends HttpToolset {
 
     public void run(String [] args) throws Exception {
         println("Let's go ...");
-        String content = doGet("https://www.google.com/");
+        //String content = doGet("https://www.google.com/");
+        //println(content);
+
+        setConfiguration(HttpToolset.ACCEPT_INVALID_SSL_CERTIFICATE, "true");
+        String content = doGet("https://tv.eurosport.com/");
         println(content);
+
         println("Done.");
     }
 }

@@ -7,6 +7,7 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ContainerFactory;
@@ -26,12 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -42,14 +38,42 @@ public class BaseToolset {
     private final static JSONParser jsonParser = new JSONParser();
 
     protected String className = null;
+    protected File currentDirectory = null;
 
     public static int EXIT_CODE = 0;
     public final static int TYPE_NOT_FOUND = -1;
     public final static int TYPE_DIRECTORY = 0;
     public final static int TYPE_FILE = 0;
 
+    protected Map<String, String> configurationHashMap = null;
+
     public BaseToolset() {
+        this.configurationHashMap = new HashMap<String, String>();
         this.className = getCallerClassName();
+
+        /*
+        if (SystemUtils.IS_OS_WINDOWS) {
+            // Assume there is a C:
+            this.currentDirectory = new File("C:\\");
+        }
+        else {
+            // Assume a Unix based system
+            this.currentDirectory = new File("/");
+        }
+        */
+        this.currentDirectory = new File(".");
+    }
+
+    public void setConfiguration(String key, String value) {
+        configurationHashMap.put(key, value);
+    }
+
+    protected String getConfiguration(String key, String defaultValue) {
+        String value = configurationHashMap.get(key);
+        if (null == value) {
+            value = defaultValue;
+        }
+        return value;
     }
 
     protected String getCallerClassName() {
@@ -103,6 +127,31 @@ public class BaseToolset {
         }
     }
 
+    public void cd(String path) throws Exception {
+        output(this.className + ".cd( " + path + " )");
+
+        File file = new File(path);
+
+        if (false == file.isAbsolute()) {
+            file = new File(this.currentDirectory.getAbsolutePath() + File.separator + path);
+        }
+
+        if (false == file.exists()) {
+            throw new IOException(path + " doesn't exist");
+        }
+
+        if (false == file.isDirectory()) {
+            throw new IOException(path + " isn't a directory");
+        }
+
+        this.currentDirectory = file;
+    }
+
+    public String pwd() throws Exception {
+        output(this.className + ".pwd() = " + this.currentDirectory.getAbsolutePath());
+        return this.currentDirectory.getAbsolutePath();
+    }
+
     public boolean exists(String path) throws Exception {
         return exists(new File(path));
     }
@@ -131,11 +180,12 @@ public class BaseToolset {
         }
     }
 
-    public void renameDirectory(String oldPath, String newPath) throws Exception {
-        renameDirectory(new File(oldPath), new File(newPath));
+    public void mv(String oldPath, String newPath) throws Exception {
+        mv(new File(oldPath), new File(newPath));
     }
 
-    public void renameDirectory(File oldFile, File newFile) throws Exception {
+    public void mv(File oldFile, File newFile) throws Exception {
+        output(this.className + ".mv( " + oldFile.getCanonicalPath() + ", " + newFile.getCanonicalPath() + " )");
         if (!oldFile.exists()) {
             throw new Exception(oldFile.getCanonicalPath() + " doesn't exist");
         }
@@ -148,98 +198,76 @@ public class BaseToolset {
             throw new Exception(newFile.getCanonicalPath() + " already exists");
         }
 
-        output(this.className + ".renameDirectory( " + oldFile.getCanonicalPath() + ", " + newFile.getCanonicalPath() + " )");
         oldFile.renameTo(newFile);
     }
 
-    public void createDirectory(String path) throws Exception {
-        createDirectory(new File(path));
+    public void mkdir(String path) throws Exception {
+        mkdir(new File(path));
     }
 
-    public void createDirectory(File file) throws Exception {
-        output(this.className + ".createDirectory( " + file.getCanonicalPath() + " )");
+    public void mkdir(File file) throws Exception {
+        output(this.className + ".mkdir( " + file.getCanonicalPath() + " )");
+        file.mkdir();
+    }
+
+    public void mkdirs(String path) throws Exception {
+        mkdir(new File(path));
+    }
+
+    public void mkdirs(File file) throws Exception {
+        output(this.className + ".mkdirs( " + file.getCanonicalPath() + " )");
         file.mkdirs();
     }
 
-    public void delete(String path) throws Exception {
-        delete(new File(path));
+    public void rm(String path, boolean force) throws Exception {
+        rm(new File(path), force);
     }
 
-    public void delete(File file) throws Exception {
-        output(this.className + ".createDirectory( " + file.getCanonicalPath() + " )");
+    public void rm(File file, boolean force) throws Exception {
+        output(this.className + ".rm( " + file.getCanonicalPath() + ", " + force + " )");
+
         if (file.exists()) {
-            if (file.isDirectory()) {
-                deleteDirectory(file);
+            if (file.isFile()) {
+                if (false == file.delete()) {
+                    throw new IOException("Unable to delete " + file.getAbsolutePath());
+                }
             }
             else {
-                file.delete();
+                if (force) {
+                    rmRecursive(file.listFiles());
+                }
+                else {
+                    if (false == file.delete()) {
+                        throw new IOException("Unable to delete " + file.getAbsolutePath());
+                    }
+                }
             }
         }
     }
 
-    public void deleteFile(String path) throws Exception {
-        deleteFile(new File(path));
-    }
-
-    public void deleteFile(File file) throws Exception {
-        output(this.className + ".createDirectory( " + file.getCanonicalPath() + " )");
-        file.delete();
-    }
-
-    public void deleteChildren(String path) throws Exception {
-        deleteFiles(new File(path).listFiles());
-    }
-
-    public void deleteChildren(File file) throws Exception {
-        deleteFiles(file.listFiles());
-    }
-
-    public void deleteFiles(File [] files) throws Exception {
+    private void rmRecursive(File [] files) throws Exception {
         if (files != null) {
             for (File file : files) {
                 if (file.isDirectory()) {
-                    deleteDirectory(file);
+                    rmRecursive(file.listFiles());
+                    if (false == file.delete()) {
+                        throw new IOException("Unable to delete " + file.getAbsolutePath());
+                    }
                 }
                 else {
-                    file.delete();
-                }
-            }
-        }
-    }
-
-    public void deleteDirectory(String path) throws Exception {
-        deleteDirectory(new File(path));
-    }
-
-    public void deleteDirectory(File file) throws Exception {
-        output(this.className + ".deleteDirectory( " + file.getCanonicalPath() + " )");
-        if (file.isDirectory()) {
-            File [] contents = file.listFiles();
-            if (contents != null) {
-                for (File f : contents) {
-                    if (f.isFile()) {
-                        deleteFile(f);
-                    }
-                    else {
-                        deleteDirectory(f);
+                    if (false == file.delete()) {
+                        throw new IOException("Unable to delete " + file.getAbsolutePath());
                     }
                 }
             }
-
-            file.delete();
-        }
-        else {
-            if (file.exists()) {
-                file.delete();
-            }
         }
     }
 
-    public void copyFile(String sourcePath, String destinationPath) throws Exception {
-        copyFile(new File(sourcePath), new File(destinationPath));
+    public void cp(String sourcePath, String destinationPath) throws Exception {
+        cp(new File(sourcePath), new File(destinationPath));
     }
 
-    public void copyFile(File sourceFile, File destinationFile) throws Exception {
+    public void cp(File sourceFile, File destinationFile) throws Exception {
         output(this.className + ".copyFile( " + sourceFile.getCanonicalPath() +", " + destinationFile.getCanonicalPath() + " )");
         FileChannel inputChannel = null;
         FileChannel outputChannel = null;
