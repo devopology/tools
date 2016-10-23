@@ -41,7 +41,7 @@ public class BaseToolset {
     private final static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     private final static JSONParser jsonParser = new JSONParser();
 
-    private String simpleClassName = null;
+    protected String className = null;
 
     public static int EXIT_CODE = 0;
     public final static int TYPE_NOT_FOUND = -1;
@@ -49,16 +49,10 @@ public class BaseToolset {
     public final static int TYPE_FILE = 0;
 
     public BaseToolset() {
-        this.simpleClassName = getCallerClassName();
-
-//        int index = this.simpleClassName.lastIndexOf(".");
-//
-//        if (-1 != index) {
-//            this.simpleClassName = this.simpleClassName.substring(index + 1);
-//        }
+        this.className = getCallerClassName();
     }
 
-    private String getCallerClassName() {
+    protected String getCallerClassName() {
         StackTraceElement [] stElements = Thread.currentThread().getStackTrace();
         for (int i=1; i<stElements.length; i++) {
             StackTraceElement ste = stElements[i];
@@ -66,10 +60,10 @@ public class BaseToolset {
                 return ste.getClassName();
             }
         }
-        return getClass().getSimpleName();
+        return getClass().getName();
     }
 
-    private void output(String message) {
+    protected void output(String message) {
         System.out.println(simpleDateFormat.format(new Date()) + " : " + message);
     }
 
@@ -97,7 +91,7 @@ public class BaseToolset {
 
             try {
                 while ((line = reader.readLine()) != null) {
-                    System.out.println(simpleDateFormat.format(new Date()) + " : " + this.simpleClassName + ".println( " + line + " )");
+                    System.out.println(simpleDateFormat.format(new Date()) + " : " + this.className + ".println( " + line + " )");
                 }
             }
             catch (IOException ioe) {
@@ -105,7 +99,7 @@ public class BaseToolset {
             }
         }
         else {
-            System.out.println(simpleDateFormat.format(new Date()) + " : " + this.simpleClassName + ".println( " + message + " )");
+            System.out.println(simpleDateFormat.format(new Date()) + " : " + this.className + ".println( " + message + " )");
         }
     }
 
@@ -123,16 +117,16 @@ public class BaseToolset {
 
     public int type(File file) throws Exception {
         if (false == file.exists()) {
-            output(this.simpleClassName + ".type( " + file.getAbsolutePath() + " ) = TYPE_NOT_FOUND");
+            output(this.className + ".type( " + file.getAbsolutePath() + " ) = TYPE_NOT_FOUND");
             return TYPE_NOT_FOUND;
         }
 
         if (file.isDirectory()) {
-            output(this.simpleClassName + ".type( " + file.getAbsolutePath() + " ) = TYPE_DIRECTORY");
+            output(this.className + ".type( " + file.getAbsolutePath() + " ) = TYPE_DIRECTORY");
             return TYPE_DIRECTORY;
         }
         else {
-            output(this.simpleClassName + ".type( " + file.getAbsolutePath() + " ) = TYPE_FILE");
+            output(this.className + ".type( " + file.getAbsolutePath() + " ) = TYPE_FILE");
             return TYPE_FILE;
         }
     }
@@ -154,7 +148,7 @@ public class BaseToolset {
             throw new Exception(newFile.getCanonicalPath() + " already exists");
         }
 
-        output(this.simpleClassName + ".renameDirectory( " + oldFile.getCanonicalPath() + ", " + newFile.getCanonicalPath() + " )");
+        output(this.className + ".renameDirectory( " + oldFile.getCanonicalPath() + ", " + newFile.getCanonicalPath() + " )");
         oldFile.renameTo(newFile);
     }
 
@@ -163,7 +157,7 @@ public class BaseToolset {
     }
 
     public void createDirectory(File file) throws Exception {
-        output(this.simpleClassName + ".createDirectory( " + file.getCanonicalPath() + " )");
+        output(this.className + ".createDirectory( " + file.getCanonicalPath() + " )");
         file.mkdirs();
     }
 
@@ -172,7 +166,7 @@ public class BaseToolset {
     }
 
     public void delete(File file) throws Exception {
-        output(this.simpleClassName + ".createDirectory( " + file.getCanonicalPath() + " )");
+        output(this.className + ".createDirectory( " + file.getCanonicalPath() + " )");
         if (file.exists()) {
             if (file.isDirectory()) {
                 deleteDirectory(file);
@@ -188,7 +182,7 @@ public class BaseToolset {
     }
 
     public void deleteFile(File file) throws Exception {
-        output(this.simpleClassName + ".createDirectory( " + file.getCanonicalPath() + " )");
+        output(this.className + ".createDirectory( " + file.getCanonicalPath() + " )");
         file.delete();
     }
 
@@ -218,7 +212,7 @@ public class BaseToolset {
     }
 
     public void deleteDirectory(File file) throws Exception {
-        output(this.simpleClassName + ".deleteDirectory( " + file.getCanonicalPath() + " )");
+        output(this.className + ".deleteDirectory( " + file.getCanonicalPath() + " )");
         if (file.isDirectory()) {
             File [] contents = file.listFiles();
             if (contents != null) {
@@ -246,7 +240,7 @@ public class BaseToolset {
     }
 
     public void copyFile(File sourceFile, File destinationFile) throws Exception {
-        output(this.simpleClassName + ".copyFile( " + sourceFile.getCanonicalPath() +", " + destinationFile.getCanonicalPath() + " )");
+        output(this.className + ".copyFile( " + sourceFile.getCanonicalPath() +", " + destinationFile.getCanonicalPath() + " )");
         FileChannel inputChannel = null;
         FileChannel outputChannel = null;
 
@@ -265,7 +259,7 @@ public class BaseToolset {
     }
 
     public void unzipFile(File zipFile, File outputFolder) throws Exception {
-        output(this.simpleClassName + ".unzipFile( " + zipFile.getCanonicalPath() + ", " + outputFolder.getCanonicalPath() + " )");
+        output(this.className + ".unzipFile( " + zipFile.getCanonicalPath() + ", " + outputFolder.getCanonicalPath() + " )");
         byte [] buffer = new byte[1024];
         if (!outputFolder.exists()) {
             outputFolder.mkdir();
@@ -306,7 +300,7 @@ public class BaseToolset {
     }
 
     public Properties loadProperties(File file) throws Exception {
-        output(this.simpleClassName + ".loadProperties( " + file.getCanonicalPath() + " )");
+        output(this.className + ".loadProperties( " + file.getCanonicalPath() + " )");
         Properties properties = new Properties();
         properties.load(new FileReader(file));
         return properties;
@@ -317,7 +311,7 @@ public class BaseToolset {
     }
 
     public void replaceProperties(Properties properties, File inputFile, File outputFile) throws Exception {
-        output(this.simpleClassName + ".replaceProperties( [properties], " + inputFile.getCanonicalPath() + ", " + outputFile.getCanonicalPath() + " )");
+        output(this.className + ".replaceProperties( [properties], " + inputFile.getCanonicalPath() + ", " + outputFile.getCanonicalPath() + " )");
         String content = readFile(inputFile);
 
         Iterator<Map.Entry<Object, Object>> iterator = properties.entrySet().iterator();
@@ -337,7 +331,7 @@ public class BaseToolset {
     }
 
     public String readFile(File file) throws Exception {
-        output(this.simpleClassName + ".readFile( " + file.getCanonicalPath() + " )");
+        output(this.className + ".readFile( " + file.getCanonicalPath() + " )");
         byte [] encoded = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
         return new String(encoded, StandardCharsets.UTF_8);
     }
@@ -347,7 +341,7 @@ public class BaseToolset {
     }
 
     public void writeFile(File file, String content) throws Exception {
-        output(this.simpleClassName + ".writeFile( " + file.getCanonicalPath() + ", [content])");
+        output(this.className + ".writeFile( " + file.getCanonicalPath() + ", [content])");
         PrintWriter printWriter = new PrintWriter(file);
         printWriter.print(content);
         printWriter.close();
@@ -358,7 +352,7 @@ public class BaseToolset {
     }
 
     public JSONObject loadJSONObject(File file) throws Exception {
-        output(this.simpleClassName + ".loadJSONObject( " + file.getCanonicalPath() + " )");
+        output(this.className + ".loadJSONObject( " + file.getCanonicalPath() + " )");
         return (JSONObject) jsonParser.parse(
                 new FileReader(file),
                 new ContainerFactory() {
@@ -379,7 +373,7 @@ public class BaseToolset {
     }
 
     public JSONArray loadJSONArray(File file) throws Exception {
-        output(this.simpleClassName + ".loadJSONArray( " + file.getCanonicalPath() + " )");
+        output(this.className + ".loadJSONArray( " + file.getCanonicalPath() + " )");
         return (JSONArray) jsonParser.parse(
                 new FileReader(file),
                 new ContainerFactory() {
@@ -414,7 +408,7 @@ public class BaseToolset {
 
     public String execute(File executable, List<String> argumentList) throws Exception {
         BaseToolset.EXIT_CODE = 0;
-        output(this.simpleClassName + ".execute( " + executable.getCanonicalPath() + listToString(argumentList) + " )");
+        output(this.className + ".execute( " + executable.getCanonicalPath() + listToString(argumentList) + " )");
 
         CommandLine commandLine = new CommandLine(executable.getAbsolutePath());
         if (null != argumentList) {
