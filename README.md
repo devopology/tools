@@ -82,7 +82,7 @@ Compile the class using "javac -cp org.devopology.tools-toolset-1.0.0.jar MyScri
 
 Run the MyScript class using "java -cp org.devopology.tools-toolset-1.0.0.jar;. MyScript"
 
-**NOTE** : Scripts are provided in the project's scripts directory for the most normal and basic scenario (org.devopology.tools-toolset-1.0.0.jar in the current directory as the "script" source file. The "script" class defined in the root Java package.
+**NOTE** : Scripts are provided in the project's scripts directory for the most normal and basic scenario (org.devopology.tools-toolset-1.0.0.jar in the current directory as the "script" source file. The "script" class defined in the root Java package.)
 
 # Beyond
 
