@@ -2,14 +2,29 @@ package com.devopology.tools;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.TrustStrategy;
+import org.apache.http.util.EntityUtils;
 
+import javax.net.ssl.SSLContext;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 public class HttpToolset extends BaseToolset {
+
+    public final static String ACCEPT_INVALID_SSL_CERTIFICATE = HttpToolset.class.getName() + ".ACCEPT_INVALID_SSL_CERTIFICATE";
 
     public HttpToolset() {
         super();
@@ -19,13 +34,12 @@ public class HttpToolset extends BaseToolset {
     protected CloseableHttpClient getHttpClient() throws Exception {
         CloseableHttpClient result = null;
 
-        /*
-        if (true == configurationTrustSSLCert) {
+        if ("true".equalsIgnoreCase(getConfiguration(ACCEPT_INVALID_SSL_CERTIFICATE, "false"))) {
             SSLContextBuilder builder = new SSLContextBuilder();
 
             SSLContext sslContext =
                     builder.loadTrustMaterial(null, new TrustStrategy() {
-                        public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+                        public boolean isTrusted(X509Certificate [] arg0, String arg1) throws CertificateException {
                             return true;
                         }
                     }).build();
@@ -38,17 +52,12 @@ public class HttpToolset extends BaseToolset {
                     .register("https", sslSocketFactory)
                     .build();
 
-            // now, we create connection-manager using our Registry.
-            //      -- allows multi-threaded use
             PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-
             result = HttpClients.custom().setConnectionManager(connectionManager).setSSLSocketFactory(sslsf).build();
         }
         else {
             result = HttpClients.createDefault();
         }
-        */
-        result = HttpClients.createDefault();
 
         return result;
     }
@@ -63,7 +72,6 @@ public class HttpToolset extends BaseToolset {
         try {
             httpclient = getHttpClient();
             HttpGet httpGet = new HttpGet(url);
-
             response = httpclient.execute(httpGet);
             int statusCode = response.getStatusLine().getStatusCode();
 
@@ -112,6 +120,13 @@ public class HttpToolset extends BaseToolset {
         finally {
             if (null != response) {
                 try {
+                    EntityUtils.consume(response.getEntity());
+                }
+                catch (Throwable t) {
+                    // DO NOTHING
+                }
+
+                try {
                     response.close();
                 }
                 catch (Throwable t) {
@@ -131,5 +146,4 @@ public class HttpToolset extends BaseToolset {
 
         return result;
     }
-
 }
