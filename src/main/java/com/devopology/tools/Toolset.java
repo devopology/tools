@@ -1,5 +1,7 @@
 package com.devopology.tools;
 
+import com.devopology.tools.impl.ExecutionResultImpl;
+import com.devopology.tools.impl.HttpResponseImpl;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
@@ -7,31 +9,41 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.TrustStrategy;
+import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringReader;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import java.io.*;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class BaseToolset {
+public class Toolset {
 
     private final static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     private final static JSONParser jsonParser = new JSONParser();
@@ -39,14 +51,15 @@ public class BaseToolset {
     protected String className = null;
     protected File currentDirectory = null;
 
-    public static int EXIT_CODE = 0;
     public final static int NOT_FOUND = -1;
     public final static int DIRECTORY = 0;
     public final static int FILE = 1;
 
+    public final static String ACCEPT_INVALID_SSL_CERTIFICATE = "ACCEPT_INVALID_SSL_CERTIFICATE";
+
     protected Map<String, String> configurationHashMap = null;
 
-    public BaseToolset() {
+    public Toolset() {
         this.configurationHashMap = new HashMap<String, String>();
         System.setErr(System.out);
         this.className = getCallerClassName();
@@ -80,7 +93,7 @@ public class BaseToolset {
         StackTraceElement [] stElements = Thread.currentThread().getStackTrace();
         for (int i=1; i<stElements.length; i++) {
             StackTraceElement ste = stElements[i];
-            if (!ste.getClassName().equals(BaseToolset.class.getName()) && ste.getClassName().indexOf("java.lang.Thread") !=0 ) {
+            if (!ste.getClassName().equals(Toolset.class.getName()) && ste.getClassName().indexOf("java.lang.Thread") !=0 ) {
                 return ste.getClassName();
             }
         }
@@ -89,6 +102,40 @@ public class BaseToolset {
 
     protected void output(String message) {
         System.out.println(simpleDateFormat.format(new Date()) + " : " + message);
+    }
+
+    @SuppressWarnings( "deprecation" )
+    protected CloseableHttpClient getHttpClient() throws Exception {
+        CloseableHttpClient result = null;
+
+        if ("true".equalsIgnoreCase(getConfiguration(ACCEPT_INVALID_SSL_CERTIFICATE, "false"))) {
+            HttpClientBuilder b = HttpClientBuilder.create();
+
+            SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
+                public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+                    return true;
+                }
+            }).build();
+            b.setSslcontext(sslContext);
+
+            HostnameVerifier hostnameVerifier = SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+
+            SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sslContext, hostnameVerifier);
+            Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
+                    .register("http", PlainConnectionSocketFactory.getSocketFactory())
+                    .register("https", sslSocketFactory)
+                    .build();
+
+            PoolingHttpClientConnectionManager connMgr = new PoolingHttpClientConnectionManager( socketFactoryRegistry);
+            b.setConnectionManager( connMgr);
+
+            result = b.build();
+        }
+        else {
+            result = HttpClients.createDefault();
+        }
+
+        return result;
     }
 
     private static String listToString(List<String> list) {
@@ -108,7 +155,13 @@ public class BaseToolset {
         return stringBuilder.toString();
     }
 
-    public void println(String message) {
+    public void println(Object object) {
+        String message = null;
+
+        if (null != object) {
+            message = object.toString();
+        }
+
         if ((null != message) && ((message.indexOf("\r") != -1) || (message.indexOf("\n") != -1))) {
             String line = null;
             BufferedReader reader = new BufferedReader(new StringReader(message));
@@ -420,7 +473,7 @@ public class BaseToolset {
     }
 
     public void writeFile(File file, String content) throws Exception {
-        output(this.className + ".writeFile( " + file.getCanonicalPath() + ", [content])");
+        output(this.className + ".writeFile( " + file.getCanonicalPath() + ", [getContent])");
         PrintWriter printWriter = new PrintWriter(file);
         printWriter.print(content);
         printWriter.close();
@@ -468,11 +521,11 @@ public class BaseToolset {
                 });
     }
 
-    public String execute(String executable, String [] argumentList) throws Exception {
+    public ExecutionResult execute(String executable, String [] argumentList) throws Exception {
         return execute(new File(executable), argumentList);
     }
 
-    public String execute(File executable, String [] argumentList) throws Exception {
+    public ExecutionResult execute(File executable, String [] argumentList) throws Exception {
         List<String> argumentList2 = null;
         if (null != argumentList) {
             argumentList2 = Arrays.asList(argumentList);
@@ -481,12 +534,11 @@ public class BaseToolset {
         return execute(executable, argumentList2);
     }
 
-    public String execute(String executable, List<String> argumentList) throws Exception {
+    public ExecutionResult execute(String executable, List<String> argumentList) throws Exception {
         return execute(new File(executable), argumentList);
     }
 
-    public String execute(File executable, List<String> argumentList) throws Exception {
-        BaseToolset.EXIT_CODE = 0;
+    public ExecutionResult execute(File executable, List<String> argumentList) throws Exception {
         output(this.className + ".execute( " + executable.getCanonicalPath() + listToString(argumentList) + " )");
 
         CommandLine commandLine = new CommandLine(executable.getAbsolutePath());
@@ -508,8 +560,100 @@ public class BaseToolset {
 
         executor.execute(commandLine, resultHandler);
         resultHandler.waitFor();
-        BaseToolset.EXIT_CODE = resultHandler.getExitValue();
 
-        return outputStream.toString();
+        ExecutionResultImpl result = new ExecutionResultImpl();
+        result.setExitCode(resultHandler.getExitValue());
+        result.setContent(outputStream.toString());
+
+        return result;
+    }
+
+    public HttpResponse doGet(String url) throws Exception {
+        return doGet(url, null);
+    }
+
+    public HttpResponse doGet(String url, Map<String, String> headerMap) throws Exception {
+        output(this.className + ".doGet( " + url + " )");
+
+        HttpResponseImpl result = new HttpResponseImpl();
+        CloseableHttpClient httpclient = null;
+        CloseableHttpResponse response = null;
+
+        try {
+            httpclient = getHttpClient();
+            HttpGet httpGet = new HttpGet(url);
+
+            if (null != headerMap) {
+                for (Map.Entry<String, String> entry : headerMap.entrySet()) {
+                    httpGet.setHeader(entry.getKey(), entry.getValue());
+                }
+            }
+
+            response = httpclient.execute(httpGet);
+            int statusCode = response.getStatusLine().getStatusCode();
+            result.setStatusCode(statusCode);
+
+            BufferedReader bufferedReader = null;
+
+            try {
+                bufferedReader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+                StringBuilder stringBuilder = new StringBuilder();
+                String line = "";
+
+                while ((line = bufferedReader.readLine()) != null) {
+                    if (stringBuilder.length() > 0) {
+                        stringBuilder.append("\r\n");
+                    }
+                    stringBuilder.append(line);
+                }
+
+                result.setContent(stringBuilder.toString());
+            }
+            finally {
+                if (null != bufferedReader) {
+                    try {
+                        bufferedReader.close();
+                    }
+                    catch (Throwable t) {
+                        // DO NOTHING
+                    }
+                }
+            }
+        }
+        catch (RuntimeException re) {
+            throw re;
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        finally {
+            if (null != response) {
+                try {
+                    EntityUtils.consume(response.getEntity());
+                }
+                catch (Throwable t) {
+                    // DO NOTHING
+                }
+
+                try {
+                    response.close();
+                }
+                catch (Throwable t) {
+                    // DO NOTHING
+                }
+            }
+
+            if (null != httpclient) {
+                try {
+                    httpclient.close();
+                }
+                catch (Throwable t) {
+                    // DO NOTHIKNG
+                }
+            }
+        }
+
+        return result;
     }
 }
