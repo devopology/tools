@@ -7,7 +7,6 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ContainerFactory;
@@ -41,9 +40,9 @@ public class BaseToolset {
     protected File currentDirectory = null;
 
     public static int EXIT_CODE = 0;
-    public final static int TYPE_NOT_FOUND = -1;
-    public final static int TYPE_DIRECTORY = 0;
-    public final static int TYPE_FILE = 0;
+    public final static int NOT_FOUND = -1;
+    public final static int DIRECTORY = 0;
+    public final static int FILE = 1;
 
     protected Map<String, String> configurationHashMap = null;
 
@@ -171,18 +170,41 @@ public class BaseToolset {
 
     public int type(File file) throws Exception {
         if (false == file.exists()) {
-            output(this.className + ".type( " + file.getAbsolutePath() + " ) = TYPE_NOT_FOUND");
-            return TYPE_NOT_FOUND;
+            output(this.className + ".type( " + file.getAbsolutePath() + " ) = NOT_FOUND");
+            return NOT_FOUND;
         }
 
         if (file.isDirectory()) {
-            output(this.className + ".type( " + file.getAbsolutePath() + " ) = TYPE_DIRECTORY");
-            return TYPE_DIRECTORY;
+            output(this.className + ".type( " + file.getAbsolutePath() + " ) = DIRECTORY");
+            return DIRECTORY;
         }
         else {
-            output(this.className + ".type( " + file.getAbsolutePath() + " ) = TYPE_FILE");
-            return TYPE_FILE;
+            output(this.className + ".type( " + file.getAbsolutePath() + " ) = FILE");
+            return FILE;
         }
+    }
+
+    public String typeString(String path) throws Exception {
+        return typeString(new File(path));
+    }
+
+    public String typeString(File file) throws Exception {
+        String result = null;
+        if (false == file.exists()) {
+            result = "NOT FOUND";
+        }
+        else if (file.isDirectory()) {
+            result = "DIRECTORY";
+        }
+        else if (file.isFile()){
+           result = "FILE";
+        }
+        else {
+            throw new RuntimeException("Developer error!!!");
+        }
+
+        output(this.className + ".typeString( " + file.getAbsolutePath() + " ) = " + result);
+        return result;
     }
 
     public void mv(String oldPath, String newPath) throws Exception {
