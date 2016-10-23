@@ -36,6 +36,8 @@ public class Example extends BaseToolset {
         String output = execute("C:/ffmpeg.exe", argumentList);
         //println(output);
 
+        rm("C:/temp/ROOT", false);
+
         output = execute("C:/ffmpeg.exe", new String [] { "-h" });
         println(output);
         println("Done.");

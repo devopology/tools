@@ -48,6 +48,7 @@ public class BaseToolset {
 
     public BaseToolset() {
         this.configurationHashMap = new HashMap<String, String>();
+        System.setErr(System.out);
         this.className = getCallerClassName();
 
         /*
@@ -238,7 +239,7 @@ public class BaseToolset {
     }
 
     public void mkdirs(String path) throws Exception {
-        mkdir(new File(path));
+        mkdirs(new File(path));
     }
 
     public void mkdirs(File file) throws Exception {
@@ -263,8 +264,12 @@ public class BaseToolset {
                 if (force) {
                     rmRecursive(file.listFiles());
                 }
-                else {
-                    if (false == file.delete()) {
+
+                if (false == file.delete()) {
+                    if ((false == force) && (file.isDirectory() && (null != file.listFiles()))) {
+                        throw new IOException("Unable to delete " + file.getAbsolutePath() + " because it is not empty");
+                    }
+                    else {
                         throw new IOException("Unable to delete " + file.getAbsolutePath());
                     }
                 }
@@ -286,6 +291,25 @@ public class BaseToolset {
                         throw new IOException("Unable to delete " + file.getAbsolutePath());
                     }
                 }
+            }
+        }
+    }
+
+    public void rmdir(String path) throws Exception {
+        rmdir(new File(path));
+    }
+
+    public void rmdir(File file) throws Exception {
+        output(this.className + ".rmdir( " + file.getCanonicalPath() + " )");
+
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                if (false == file.delete()) {
+                    throw new IOException("Unable to delete " + file.getAbsolutePath());
+                }
+            }
+            else {
+                throw new IOException(file.getAbsolutePath() + " is not a directory");
             }
         }
     }
