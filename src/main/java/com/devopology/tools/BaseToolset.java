@@ -148,8 +148,13 @@ public class BaseToolset {
     }
 
     public String pwd() throws Exception {
-        output(this.className + ".pwd() = " + this.currentDirectory.getAbsolutePath());
-        return this.currentDirectory.getAbsolutePath();
+        String path = this.currentDirectory.getAbsolutePath();
+        if (path.endsWith("/.") || path.endsWith("\\.")) {
+            path = path.substring(0, path.length() - 2);
+        }
+
+        output(this.className + ".pwd() = " + path);
+        return path;
     }
 
     public boolean exists(String path) throws Exception {
