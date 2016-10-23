@@ -1,3 +1,5 @@
 .idea
-DevOPS.iml
+
+*.iml
+
 target
