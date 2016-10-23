@@ -14,12 +14,13 @@ public class Example extends BaseToolset {
         println("Let's go ...");
         pwd();
 
-        if (TYPE_DIRECTORY == type("C:/temp/ROOT/opt/company")) {
+        if (DIRECTORY == type("C:/temp/ROOT/opt/company")) {
             mv("C:/temp/ROOT/opt/company", "C:/temp/ROOT/opt/company" + "-" + System.currentTimeMillis());
         }
 
         pwd();
         mkdirs("C:/temp/ROOT/opt/company");
+        typeString("C:/temp/ROOT/opt/company");
         cd("C:/temp/ROOT/opt/company");
 
         //unzipFile("C:/temp/somezipfile.zip", "C:/temp/ROOT/opt/company");
