@@ -1,11 +1,11 @@
 package com.devopology.tools.test;
 
-import com.devopology.tools.HttpToolset;
+import com.devopology.tools.Toolset;
 
 /**
  * Created by Doug on 10/22/2016.
  */
-public class Example3 extends HttpToolset {
+public class Example3 extends Toolset {
     public static void main(String [] args) throws Exception {
         new Example3().run(args);
     }

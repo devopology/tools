@@ -1,11 +1,12 @@
 package com.devopology.tools.test;
 
-import com.devopology.tools.BaseToolset;
+import com.devopology.tools.ExecutionResult;
+import com.devopology.tools.Toolset;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Example extends BaseToolset {
+public class Example extends Toolset {
     public static void main(String [] args) throws Exception {
         new Example().run(args);
     }
@@ -33,13 +34,13 @@ public class Example extends BaseToolset {
 
         List<String> argumentList = new ArrayList();
         argumentList.add("-h");
-        String output = execute("C:/ffmpeg.exe", argumentList);
+        ExecutionResult executionResult = execute("C:/ffmpeg.exe", argumentList);
         //println(output);
 
-        rm("C:/temp/ROOT", false);
+        rm("C:/temp/ROOT", true);
 
-        output = execute("C:/ffmpeg.exe", new String [] { "-h" });
-        println(output);
+        executionResult = execute("C:/ffmpeg.exe", new String [] { "-h" });
+        println(executionResult.getContent());
         println("Done.");
     }
 }
