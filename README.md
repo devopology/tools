@@ -82,6 +82,9 @@ Compile the class using "javac -cp org.devopology.tools-toolset-1.0.0.jar MyScri
 
 Run the MyScript class using "java -cp org.devopology.tools-toolset-1.0.0.jar;. MyScript"
 
+NOTE :  
+Scripts are provided in the project's scripts directory for the most normal and basic scenario (org.devopology.tools-toolset-1.0.0.jar in the current directory as the script. "Script" class defined in the root Java package with the source file located in the current directory as the script.
+
 # Beyond
 
 Want more functionality than what's included ? ... Add new depdencies jars to the pom.xml file and then extend the Toolset class to add the new functionality ...
