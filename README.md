@@ -18,7 +18,9 @@ Over the course of ~20 years, dealing with various Java software applications, J
 With those "truths" (... at least in my mind ...) I set out to develop code to wrap a lot of common
 functionality that would allow easy dev-op script functions.
 
-For example, the devopology toolset allows easy use of file operations (cp, mv, rmdir), JSON based processing, Properties based processing, Apache Commons Lang, Apache HttpClient, Apache Commons IO, and Apache Commons Exec ... plus any other Java functionality you require because you can easily write it in Java.  Need custom code to call a REST API ? ... easy ... just use your existing client API / implement it in Java.
+For example, the devopology toolset allows easy use of file operations (cp, mv, rmdir), JSON based processing, Properties based processing, Apache Commons Lang, Apache HttpClient, Apache Commons IO, and Apache Commons Exec ... plus any other Java functionality you require because you can easily write it in Java.
+
+Need custom code to call a REST API ? ... easy ... just use your existing client API / implement it in Java.
 
 One unique feature is that the Toolset class has a concept of a "current directory" which is based on the Java concept of current directory when the class is executed.  This allows functionality such as
 
