@@ -1,4 +1,4 @@
-![devOPology](https://raw.githubusercontent.com/devopology/tools/develop/devopology.png)
+![devopology](https://raw.githubusercontent.com/devopology/tools/develop/devopology.png)
 
 master  
 [![Build Status](https://travis-ci.org/devopology/tools.svg?branch=master)](https://travis-ci.org/devopology/tools)
