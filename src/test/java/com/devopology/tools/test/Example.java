@@ -16,11 +16,11 @@ public class Example extends Toolset {
         pwd();
 
         if (DIRECTORY == type("C:/temp/ROOT/opt/company")) {
-            mv("C:/temp/ROOT/opt/company", "C:/temp/ROOT/opt/company" + "-" + System.currentTimeMillis());
+            //mv("C:/temp/ROOT/opt/company", "C:/temp/ROOT/opt/company" + "-" + System.currentTimeMillis());
         }
 
         pwd();
-        mkdirs("C:/temp/ROOT/opt/company");
+        //mkdirs("C:/temp/ROOT/opt/company");
         typeString("C:/temp/ROOT/opt/company");
         cd("C:/temp/ROOT/opt/company");
 
@@ -29,7 +29,7 @@ public class Example extends Toolset {
         //Properties properties = loadProperties("C:/temp/ROOT/opt/company/project/configuration.properties");
         //replaceProperties(properties, "C:/temp/ROOT/opt/company/project/document.template", "C:/temp/ROOT/opt/company/project/document.sample");
 
-        mkdirs("C:/temp/ROOT/lib/systemd/system");
+        //mkdirs("C:/temp/ROOT/lib/systemd/system");
         //copyFile("C:/temp/ROOT/opt/company/project/document.sample", "C:/temp/ROOT/lib/systemd/system/document.sample");
 
         List<String> argumentList = new ArrayList();
@@ -37,7 +37,7 @@ public class Example extends Toolset {
         ExecutionResult executionResult = execute("C:/ffmpeg.exe", argumentList);
         //println(output);
 
-        rm("C:/temp/ROOT", true);
+        //rm("C:/temp/ROOT", true);
 
         executionResult = execute("C:/ffmpeg.exe", new String [] { "-h" });
         println(executionResult.getContent());
