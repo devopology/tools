@@ -26,4 +26,8 @@ public class ExecutionResultImpl implements ExecutionResult {
     public String getContent() {
         return content;
     }
+
+    public String toString() {
+        return content;
+    }
 }

@@ -1,7 +1,6 @@
 package com.devopology.tools.test;
 
 import com.devopology.tools.Toolset;
-import com.devopology.tools.HttpResponse;
 
 /**
  * Created by Doug on 10/22/2016.
@@ -16,8 +15,8 @@ public class Example2 extends Toolset {
         //String getContent = doGet("https://www.google.com/");
         //println(getContent);
         setConfiguration(ACCEPT_INVALID_SSL_CERTIFICATE, "true");
-        HttpResponse httpResponse = doGet("https://www.selfsignedcertificate.com/");
-        println(httpResponse.toString());
+        //HttpResponse httpResponse = doGet("https://www.selfsignedcertificate.com/");
+        //println(httpResponse.toString());
         println("Done.");
     }
 }
