@@ -31,6 +31,8 @@ public class Toolset {
     public final static String RM = "/usr/bin/rm";
     public final static String UNZIP = "/usr/bin/unzip";
 
+    public static int EXIT_CODE = 0;
+
     public final static int NOT_FOUND = -1;
     public final static int DIRECTORY = 0;
     public final static int FILE = 1;
@@ -347,6 +349,8 @@ public class Toolset {
     public ExecutionResult execute(File executable, List<String> argumentList) throws Exception {
         output("execute( " + executable.getCanonicalPath() + listToString(argumentList) + " )");
 
+        EXIT_CODE = 0;
+
         CommandLine commandLine = new CommandLine(executable.getAbsolutePath());
         if (null != argumentList) {
             for (String argument : argumentList) {
@@ -371,6 +375,18 @@ public class Toolset {
         result.setExitCode(resultHandler.getExitValue());
         result.setContent(outputStream.toString());
 
+        EXIT_CODE = result.getExitCode();
+
         return result;
+    }
+
+    public int exitCode() {
+        return EXIT_CODE;
+    }
+
+    public void checkExitCode(int expectedExitCode) throws Exception {
+        if (EXIT_CODE != expectedExitCode) {
+            throw new Exception("Expected exit code of " + expectedExitCode + " but execution returned " + EXIT_CODE);
+        }
     }
 }
