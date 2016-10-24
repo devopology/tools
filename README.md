@@ -86,7 +86,7 @@ Run the MyScript class using "java -cp org.devopology.tools-toolset-1.0.0.jar;. 
 
 # Beyond
 
-Want more functionality than what's included ? ... Add new depdencies jars to the pom.xml file and then extend the Toolset class to add the new functionality ...
+Want more functionality than what's included ? ... Add new dependencies to the pom.xml file and then extend the Toolset class to add the new functionality ...
 
     import com.devopology.tools.*;
     // other imports depending on what you need
