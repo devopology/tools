@@ -22,11 +22,18 @@ public class Toolset {
 
     protected File currentDirectory = null;
 
+    public final static String SYSTEMD_SERVICE_ROOT = "/lib/systemd/system";
+
+    public final static String SYSTEMCTL = "/usr/bin/systemctl";
+    public final static String CP = "/usr/bin/cp";
+    public final static String LS = "/usr/bin/ls";
+    public final static String MKDIR = "/usr/bin/mkdir";
+    public final static String RM = "/usr/bin/rm";
+    public final static String UNZIP = "/usr/bin/unzip";
+
     public final static int NOT_FOUND = -1;
     public final static int DIRECTORY = 0;
     public final static int FILE = 1;
-
-    public final static String ACCEPT_INVALID_SSL_CERTIFICATE = "ACCEPT_INVALID_SSL_CERTIFICATE";
 
     protected Map<String, String> configurationHashMap = null;
 
