@@ -103,22 +103,6 @@ public class Toolset {
         return getClass().getName();
     }
 
-    public File absoluteFile(String path) throws Exception {
-        File file = new File(path);
-        if (!file.isAbsolute()) {
-            file = new File(pwd() + File.separator + path);
-        }
-
-        return file;
-    }
-
-    public File absoluteFile(File file) throws Exception {
-        if (!file.isAbsolute()) {
-            file = new File(pwd() + File.separator + file.getName());
-        }
-        return file;
-    }
-
     /**
      * Method to set a configuration key / value
      *
@@ -272,19 +256,64 @@ public class Toolset {
     }
 
     /**
-     * Method to get an absolute filename
+     * Method to get an absolute path
      *
      * @param path
      * @return
      * @throws Exception
      */
-    public String absolute(String path) throws Exception {
+    public String absolutePath(String path) throws Exception {
         File file = new File(path);
         if (!file.isAbsolute()) {
             file = new File(pwd() + File.separator + path);
         }
 
         return file.getCanonicalPath();
+    }
+
+    /**
+     * Method to get an absolute path
+     *
+     * @param file
+     * @return
+     * @throws Exception
+     */
+    public String absolutePath(File file) throws Exception {
+        if (!file.isAbsolute()) {
+            file = new File(pwd() + File.separator + file.getName());
+        }
+        
+        return file.getCanonicalPath();
+    }
+
+
+    /**
+     * Method to get an absolute File
+     *
+     * @param path
+     * @return
+     * @throws Exception
+     */
+    public File absoluteFile(String path) throws Exception {
+        File file = new File(path);
+        if (!file.isAbsolute()) {
+            file = new File(pwd() + File.separator + path);
+        }
+
+        return file;
+    }
+
+    /**
+     * Method to get an absolute File
+     * @param file
+     * @return
+     * @throws Exception
+     */
+    public File absoluteFile(File file) throws Exception {
+        if (!file.isAbsolute()) {
+            file = new File(pwd() + File.separator + file.getName());
+        }
+        return file;
     }
 
     /**
@@ -391,6 +420,7 @@ public class Toolset {
     public void rename(File oldFile, File newFile) throws Exception {
         oldFile = absoluteFile(oldFile);
         newFile = absoluteFile(newFile);
+        output("rename( " + oldFile.getCanonicalPath() + ", " + newFile.getCanonicalPath() + " )");
         oldFile.renameTo(newFile);
     }
 
@@ -403,8 +433,9 @@ public class Toolset {
      */
     public List<File> recurivelyListFiles(String path) throws Exception {
         List<File> result = new ArrayList<File>();
-
         File file = absoluteFile(path);
+        output("recurivelyListFiles( " + file.getCanonicalPath() + " )");
+
         if (file.isDirectory()) {
             File [] children = file.listFiles();
             if (null != children) {
@@ -487,6 +518,28 @@ public class Toolset {
         }
 
         return content;
+    }
+
+    /**
+     * Method to replace Properties in a file
+     *
+     * @param prooperties
+     * @param path
+     * @throws Exception
+     */
+    public void replaceProperties(Properties prooperties, String path) throws Exception {
+        replaceProperties(prooperties, path, path);
+    }
+
+    /**
+     * Method to replace Properties in a file
+     *
+     * @param prooperties
+     * @param file
+     * @throws Exception
+     */
+    public void replaceProperties(Properties prooperties, File file) throws Exception {
+        replaceProperties(prooperties, file, file);
     }
 
     /**
