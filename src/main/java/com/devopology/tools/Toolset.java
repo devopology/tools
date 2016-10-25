@@ -1,13 +1,17 @@
 package com.devopology.tools;
 
 import com.devopology.tools.impl.ExecutionResultImpl;
+import com.sun.xml.internal.bind.api.impl.NameConverter;
 import org.apache.commons.exec.*;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -31,44 +35,27 @@ public class Toolset {
     public final static String RM = "/usr/bin/rm";
     public final static String UNZIP = "/usr/bin/unzip";
 
-    public static int EXIT_CODE = 0;
+    private static int EXIT_CODE = 0;
 
+    /**
+     * File types
+     */
     public final static int NOT_FOUND = -1;
     public final static int DIRECTORY = 0;
     public final static int FILE = 1;
 
-    protected Map<String, String> configurationHashMap = null;
+    protected Properties properties = null;
 
+    /**
+     * Constructor
+     */
     public Toolset() {
         System.setErr(System.out);
-        this.configurationHashMap = new HashMap<String, String>();
-        this.currentDirectory = new File(".");
+        this.properties = new Properties();
+        this.currentDirectory = new File(".").getAbsoluteFile();
     }
 
-    public void setConfiguration(String key, String value) {
-        configurationHashMap.put(key, value);
-    }
-
-    protected String getConfiguration(String key, String defaultValue) {
-        String value = configurationHashMap.get(key);
-        if (null == value) {
-            value = defaultValue;
-        }
-        return value;
-    }
-
-    protected String getCallerClassName() {
-        StackTraceElement [] stElements = Thread.currentThread().getStackTrace();
-        for (int i=1; i<stElements.length; i++) {
-            StackTraceElement ste = stElements[i];
-            if (!ste.getClassName().equals(Toolset.class.getName()) && ste.getClassName().indexOf("java.lang.Thread") !=0 ) {
-                return ste.getClassName();
-            }
-        }
-        return getClass().getName();
-    }
-
-    protected void output(String message) {
+    private void output(String message) {
         System.out.println(simpleDateFormat.format(new Date()) + " : " + message);
     }
 
@@ -89,6 +76,95 @@ public class Toolset {
         return stringBuilder.toString();
     }
 
+    private String getCallerClassName() {
+        StackTraceElement [] stElements = Thread.currentThread().getStackTrace();
+        for (int i=1; i<stElements.length; i++) {
+            StackTraceElement ste = stElements[i];
+            if (!ste.getClassName().equals(Toolset.class.getName()) && ste.getClassName().indexOf("java.lang.Thread") !=0 ) {
+                return ste.getClassName();
+            }
+        }
+
+        return getClass().getName();
+    }
+
+    private File absoluteFile(String path) throws Exception {
+        File file = new File(path);
+        if (!file.isAbsolute()) {
+            file = new File(pwd() + File.separator + path);
+        }
+
+        return file;
+    }
+
+    public File absoluteFile(File file) throws Exception {
+        if (!file.isAbsolute()) {
+            file = new File(pwd() + File.separator + file.getName());
+        }
+        return file;
+    }
+
+    /**
+     * Method to set a configuration key / value
+     *
+     * @param key
+     * @param value
+     */
+    public void setConfiguration(String key, String value) {
+        properties.setProperty(key, value);
+    }
+
+    /**
+     * Method to set configuration Properties
+     *
+     * @param properties
+     */
+    public void setConfiguration(Properties properties) {
+        if (null == properties) {
+            properties = new Properties();
+        }
+
+        this.properties = properties;
+    }
+
+    /**
+     * Method to merge Properties into the current configuration Properties
+     *
+     * @param properties
+     */
+    public void mergeConfiguration(Properties properties) {
+        if (null != properties) {
+            for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+                this.properties.setProperty((String) entry.getKey(), (String) entry.getValue());
+            }
+        }
+    }
+
+    /**
+     * Method to clear configuration Properties
+     */
+    public void clearConfiguration() {
+        this.properties.clear();
+    }
+
+    /**
+     * Method to get a configuration value based on key
+     *
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    public String getConfiguration(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
+    }
+
+    /**
+     * Method to convert a string with CRLF to a list
+     *
+     * @param string
+     * @return
+     * @throws IOException
+     */
     public List<String> stringToList(String string) throws IOException {
         List<String> result = new ArrayList<String>();
 
@@ -104,14 +180,21 @@ public class Toolset {
         return result;
     }
 
-    public String stripExtension(String filename) {
-        if (filename.indexOf(".") > 0) {
-            filename = filename.substring(0, filename.lastIndexOf('.'));
-        }
-
-        return filename;
+    /**
+     * Method to get a filename without extension
+     *
+     * @param filename
+     * @return
+     */
+    public String noExtension(String filename) {
+        return FilenameUtils.removeExtension(filename);
     }
 
+    /**
+     * Method to print a line
+     *
+     * @param object
+     */
     public void println(Object object) {
         String message = null;
 
@@ -137,14 +220,15 @@ public class Toolset {
         }
     }
 
+    /**
+     * Method to change the current working directory
+     *
+     * @param path
+     * @throws Exception
+     */
     public void cd(String path) throws Exception {
-        output("cd( " + path + " )");
-
-        File file = new File(path);
-
-        if (false == file.isAbsolute()) {
-            file = new File(this.currentDirectory.getAbsolutePath() + File.separator + path);
-        }
+        File file = absoluteFile(path);
+        output("cd( " + file.getCanonicalPath() + " )");
 
         if (false == file.exists()) {
             throw new IOException(path + " doesn't exist");
@@ -157,8 +241,14 @@ public class Toolset {
         this.currentDirectory = file;
     }
 
+    /**
+     * Method to get the current working directory
+     *
+     * @return
+     * @throws Exception
+     */
     public String pwd() throws Exception {
-        String path = this.currentDirectory.getAbsolutePath();
+        String path = this.currentDirectory.getCanonicalPath();
         if (path.endsWith("/.") || path.endsWith("\\.")) {
             path = path.substring(0, path.length() - 2);
         }
@@ -166,59 +256,125 @@ public class Toolset {
         return path;
     }
 
+    /**
+     * Method to get an absolute filename
+     *
+     * @param path
+     * @return
+     * @throws Exception
+     */
     public String absolute(String path) throws Exception {
         File file = new File(path);
         if (!file.isAbsolute()) {
             file = new File(pwd() + File.separator + path);
         }
 
-        return file.getAbsolutePath();
+        return file.getCanonicalPath();
     }
 
+    /**
+     * Method to load properties from a file
+     *
+     * @param path
+     * @return
+     * @throws Exception
+     */
     public Properties loadProperties(String path) throws Exception {
-        return loadProperties(new File(path));
+        return loadProperties(absolute(path));
     }
 
+    /**
+     * Method to load Properties from a file
+     *
+     * @param file
+     * @return
+     * @throws Exception
+     */
     public Properties loadProperties(File file) throws Exception {
+        file = absoluteFile(file);
         output("loadProperties( " + file.getCanonicalPath() + " )");
         Properties properties = new Properties();
         properties.load(new FileReader(file));
         return properties;
     }
 
+    /**
+     * Method to determine if a file exists
+     *
+     * @param path
+     * @return
+     * @throws Exception
+     */
     public boolean exists(String path) throws Exception {
-        return exists(new File(path));
+        return exists(absoluteFile(path));
     }
 
+    /**
+     * Method to determine if a file exists
+     *
+     * @param file
+     * @return
+     * @throws Exception
+     */
     public boolean exists(File file) throws Exception {
-        return file.getCanonicalFile().exists();
+        return absoluteFile(file).exists();
     }
 
+    /**
+     * Method to get the "type" of a file
+     *
+     * @param path
+     * @return
+     * @throws Exception
+     */
     public int type(String path) throws Exception {
-        return type(new File(path));
+        return type(absoluteFile(path));
     }
 
+    /**
+     * Method to get the "type" of a file
+     *
+     * @param file
+     * @return
+     * @throws Exception
+     */
     public int type(File file) throws Exception {
+        file = absoluteFile(file);
         if (false == file.exists()) {
-            output("type( " + file.getAbsolutePath() + " ) = NOT_FOUND");
+            output("type( " + file.getCanonicalPath() + " ) = NOT_FOUND");
             return NOT_FOUND;
         }
 
         if (file.isDirectory()) {
-            output("type( " + file.getAbsolutePath() + " ) = DIRECTORY");
+            output("type( " + file.getCanonicalPath() + " ) = DIRECTORY");
             return DIRECTORY;
         }
         else {
-            output("type( " + file.getAbsolutePath() + " ) = FILE");
+            output("type( " + file.getCanonicalPath() + " ) = FILE");
             return FILE;
         }
     }
 
+    /**
+     * Method to get the "type" of a file as a String
+     *
+     * @param path
+     * @return
+     * @throws Exception
+     */
     public String typeString(String path) throws Exception {
-        return typeString(new File(path));
+        return typeString(absoluteFile(path));
     }
 
+    /**
+     * Method to get the "type" of a file as a String
+     *
+     * @param file
+     * @return
+     * @throws Exception
+     */
     public String typeString(File file) throws Exception {
+        file = absoluteFile(file);
         String result = null;
         if (false == file.exists()) {
             result = "NOT FOUND";
@@ -233,15 +389,53 @@ public class Toolset {
             throw new RuntimeException("Developer error!!!");
         }
 
-        output("typeString( " + file.getAbsolutePath() + " ) = " + result);
+        output("typeString( " + file.getCanonicalPath() + " ) = " + result);
         return result;
     }
 
-    public void replaceProperties(Properties properties, String inputFilePath, String outputFilePath) throws Exception {
-        replaceProperties(properties, new File(inputFilePath), new File(outputFilePath));
+    /**
+     * Method to replace Properties in a String
+     *
+     * @param content
+     * @return
+     */
+    public String replaceProperties(String content) {
+        println("replaceProperties( [properties] )");
+        Iterator<Map.Entry<Object, Object>> iterator = properties.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Object, Object> entry = iterator.next();
+            String key = (String) entry.getKey();
+            String value = (String) entry.getValue();
+
+            content = content.replaceAll(Pattern.quote("${" + key + "}"), value);
+        }
+
+        return content;
     }
 
+    /**
+     * Method to replace Properties in a file
+     *
+     * @param properties
+     * @param inputFilePath
+     * @param outputFilePath
+     * @throws Exception
+     */
+    public void replaceProperties(Properties properties, String inputFilePath, String outputFilePath) throws Exception {
+        replaceProperties(properties, absoluteFile(inputFilePath), absoluteFile(outputFilePath));
+    }
+
+    /**
+     * Method to replace Properties in a file
+     *
+     * @param properties
+     * @param inputFile
+     * @param outputFile
+     * @throws Exception
+     */
     public void replaceProperties(Properties properties, File inputFile, File outputFile) throws Exception {
+        inputFile = absoluteFile(inputFile);
+        outputFile = absoluteFile(outputFile);
         output("replaceProperties( [properties], " + inputFile.getCanonicalPath() + ", " + outputFile.getCanonicalPath() + " )");
         String content = readFile(inputFile);
 
@@ -257,38 +451,99 @@ public class Toolset {
         writeFile(outputFile, content);
     }
 
+    /**
+     * Method to read a file's contents into String
+     *
+     * @param path
+     * @return
+     * @throws Exception
+     */
     public String readFile(String path) throws Exception {
-        return readFile(new File(path));
+        return FileUtils.readFileToString(absoluteFile(path), StandardCharsets.UTF_8);
     }
 
+    /**
+     * Method to read a file's contents into String
+     *
+     * @param file
+     * @return
+     * @throws Exception
+     */
     public String readFile(File file) throws Exception {
-        output("readFile( " + file.getCanonicalPath() + " )");
-        if (!file.isAbsolute()) {
-            file = new File(pwd() + File.separator + file.getName());
-        }
-        byte [] encoded = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
-        return new String(encoded, StandardCharsets.UTF_8);
+        return FileUtils.readFileToString(absoluteFile(file), StandardCharsets.UTF_8);
     }
 
+    /**
+     * Method to write a String to a file
+     *
+     * @param path
+     * @param content
+     * @throws Exception
+     */
     public void writeFile(String path, String content) throws Exception {
-        writeFile(new File(path), content);
+        writeFile(absoluteFile(path), content);
     }
 
+    /**
+     * Method to write a String to a file
+     *
+     * @param file
+     * @param content
+     * @throws Exception
+     */
     public void writeFile(File file, String content) throws Exception {
+        file = absoluteFile(file);
         output("writeFile( " + file.getCanonicalPath() + ", [getContent])");
-        if (!file.isAbsolute()) {
-            file = new File(pwd() + File.separator + file.getName());
-        }
+
         PrintWriter printWriter = new PrintWriter(file);
         printWriter.print(content);
         printWriter.close();
     }
 
-    public JSONObject loadJSONObject(String path) throws Exception {
-        return loadJSONObject(new File(path));
+    /**
+     * Method to parse a String as a JSONObject
+     *
+     * @param json
+     * @return
+     * @throws Exception
+     */
+    public JSONObject parseJSONObject(String json) throws Exception {
+        output("parseJSONObject( [json] )");
+        return (JSONObject) jsonParser.parse(
+                json,
+                new ContainerFactory() {
+                    @Override
+                    public Map createObjectContainer() {
+                        return null;
+                    }
+
+                    @Override
+                    public List creatArrayContainer() {
+                        return null;
+                    }
+                });
     }
 
+    /**
+     * Method to load a file's content as a JSONObject
+     *
+     * @param path
+     * @return
+     * @throws Exception
+     */
+    public JSONObject loadJSONObject(String path) throws Exception {
+        return loadJSONObject(absoluteFile(path));
+    }
+
+    /**
+     * Method to load a file's content as a JSONObject
+     *
+     * @param file
+     * @return
+     * @throws Exception
+     */
     public JSONObject loadJSONObject(File file) throws Exception {
+        file = absoluteFile(file);
         output("loadJSONObject( " + file.getCanonicalPath() + " )");
         return (JSONObject) jsonParser.parse(
                 new FileReader(file),
@@ -305,11 +560,50 @@ public class Toolset {
                 });
     }
 
-    public JSONArray loadJSONArray(String path) throws Exception {
-        return loadJSONArray(new File(path));
+    /**
+     * Method to parse a String as a JSONArray
+     *
+     * @param json
+     * @return
+     * @throws Exception
+     */
+    public JSONArray parseJSONArray(String json) throws Exception {
+        output("parseJSONArray( [json] )");
+        return (JSONArray) jsonParser.parse(
+                json,
+                new ContainerFactory() {
+                    @Override
+                    public Map createObjectContainer() {
+                        return null;
+                    }
+
+                    @Override
+                    public List creatArrayContainer() {
+                        return null;
+                    }
+                });
     }
 
+    /**
+     * Method to load a file's content as a JSONArray
+     *
+     * @param path
+     * @return
+     * @throws Exception
+     */
+    public JSONArray loadJSONArray(String path) throws Exception {
+        return loadJSONArray(absoluteFile(path));
+    }
+
+    /**
+     * Method to load a file's content as a JSONArray
+     *
+     * @param file
+     * @return
+     * @throws Exception
+     */
     public JSONArray loadJSONArray(File file) throws Exception {
+        file = absoluteFile(file);
         output("loadJSONArray( " + file.getCanonicalPath() + " )");
         return (JSONArray) jsonParser.parse(
                 new FileReader(file),
@@ -326,11 +620,28 @@ public class Toolset {
                 });
     }
 
+    /**
+     * Method to execute an executable
+     *
+     * @param executable
+     * @param arguments
+     * @return
+     * @throws Exception
+     */
     public ExecutionResult execute(String executable, String ... arguments) throws Exception {
-        return execute(new File(executable), arguments);
+        return execute(absoluteFile(executable), arguments);
     }
 
+    /**
+     * Method to execute an executable
+     *
+     * @param executable
+     * @param arguments
+     * @return
+     * @throws Exception
+     */
     public ExecutionResult execute(File executable, String ... arguments) throws Exception {
+        executable = absoluteFile(executable);
         List<String> argumentList = null;
         if (null != arguments) {
             argumentList = new ArrayList<String>();
@@ -342,16 +653,33 @@ public class Toolset {
         return execute(executable, argumentList);
     }
 
+    /**
+     * Method to execute an executable
+     *
+     * @param executable
+     * @param argumentList
+     * @return
+     * @throws Exception
+     */
     public ExecutionResult execute(String executable, List<String> argumentList) throws Exception {
-        return execute(new File(executable), argumentList);
+        return execute(absoluteFile(executable), argumentList);
     }
 
+    /**
+     * Method to execute an executable
+     *
+     * @param executable
+     * @param argumentList
+     * @return
+     * @throws Exception
+     */
     public ExecutionResult execute(File executable, List<String> argumentList) throws Exception {
+        executable = absoluteFile(executable);
         output("execute( " + executable.getCanonicalPath() + listToString(argumentList) + " )");
 
         EXIT_CODE = 0;
 
-        CommandLine commandLine = new CommandLine(executable.getAbsolutePath());
+        CommandLine commandLine = new CommandLine(executable.getCanonicalPath());
         if (null != argumentList) {
             for (String argument : argumentList) {
                 commandLine.addArgument(argument);
@@ -380,10 +708,21 @@ public class Toolset {
         return result;
     }
 
+    /**
+     * Method to get the exit code of the last execute command
+     *
+     * @return
+     */
     public int exitCode() {
         return EXIT_CODE;
     }
 
+    /**
+     * Method to check the exit code of the last execute command
+     *
+     * @param expectedExitCode
+     * @throws Exception
+     */
     public void checkExitCode(int expectedExitCode) throws Exception {
         if (EXIT_CODE != expectedExitCode) {
             throw new Exception("Expected exit code of " + expectedExitCode + " but execution returned " + EXIT_CODE);
