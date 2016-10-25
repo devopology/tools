@@ -103,22 +103,6 @@ public class Toolset {
         return getClass().getName();
     }
 
-    private File absoluteFile(String path) throws Exception {
-        File file = new File(path);
-        if (!file.isAbsolute()) {
-            file = new File(pwd() + File.separator + path);
-        }
-
-        return file;
-    }
-
-    public File absoluteFile(File file) throws Exception {
-        if (!file.isAbsolute()) {
-            file = new File(pwd() + File.separator + file.getName());
-        }
-        return file;
-    }
-
     /**
      * Method to set a configuration key / value
      *
@@ -253,7 +237,7 @@ public class Toolset {
             throw new IOException(path + " isn't a directory");
         }
 
-        this.currentDirectory = file;
+        this.currentDirectory = file.getAbsoluteFile();
     }
 
     /**
@@ -272,19 +256,64 @@ public class Toolset {
     }
 
     /**
-     * Method to get an absolute filename
+     * Method to get an absolute path
      *
      * @param path
      * @return
      * @throws Exception
      */
-    public String absolute(String path) throws Exception {
+    public String absolutePath(String path) throws Exception {
         File file = new File(path);
         if (!file.isAbsolute()) {
             file = new File(pwd() + File.separator + path);
         }
 
         return file.getCanonicalPath();
+    }
+
+    /**
+     * Method to get an absolute path
+     *
+     * @param file
+     * @return
+     * @throws Exception
+     */
+    public String absolutePath(File file) throws Exception {
+        if (!file.isAbsolute()) {
+            file = new File(pwd() + File.separator + file.getName());
+        }
+        
+        return file.getCanonicalPath();
+    }
+
+
+    /**
+     * Method to get an absolute File
+     *
+     * @param path
+     * @return
+     * @throws Exception
+     */
+    public File absoluteFile(String path) throws Exception {
+        File file = new File(path);
+        if (!file.isAbsolute()) {
+            file = new File(pwd() + File.separator + path);
+        }
+
+        return file;
+    }
+
+    /**
+     * Method to get an absolute File
+     * @param file
+     * @return
+     * @throws Exception
+     */
+    public File absoluteFile(File file) throws Exception {
+        if (!file.isAbsolute()) {
+            file = new File(pwd() + File.separator + file.getName());
+        }
+        return file;
     }
 
     /**
@@ -371,6 +400,69 @@ public class Toolset {
     }
 
     /**
+     * Method to rename a file
+     *
+     * @param oldPath
+     * @param newPath
+     * @throws Exception
+     */
+    public void rename(String oldPath, String newPath) throws Exception {
+        rename(absoluteFile(oldPath), absoluteFile(newPath));
+    }
+
+    /**
+     * Method to rename a file
+     *
+     * @param oldFile
+     * @param newFile
+     * @throws Exception
+     */
+    public void rename(File oldFile, File newFile) throws Exception {
+        oldFile = absoluteFile(oldFile);
+        newFile = absoluteFile(newFile);
+        output("rename( " + oldFile.getCanonicalPath() + ", " + newFile.getCanonicalPath() + " )");
+        oldFile.renameTo(newFile);
+    }
+
+    /**
+     * Method to recursive list all children, grandchildren, etc.
+     *
+     * @param path
+     * @return
+     * @throws Exception
+     */
+    public List<File> recurivelyListFiles(String path) throws Exception {
+        List<File> result = new ArrayList<File>();
+        File file = absoluteFile(path);
+        output("recurivelyListFiles( " + file.getCanonicalPath() + " )");
+
+        if (file.isDirectory()) {
+            File [] children = file.listFiles();
+            if (null != children) {
+                for (File child : children) {
+                    walkTree(absoluteFile(child), result);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private void walkTree(File file, List<File> list) throws Exception {
+        if (file.isFile()) {
+            list.add(file);
+        }
+        else {
+            File [] children = file.listFiles();
+            if (null != children) {
+                for (File child : children) {
+                    walkTree(absoluteFile(child), list);
+                }
+            }
+        }
+    }
+
+    /**
      * Method to get the "type" of a file as a String
      *
      * @param path
@@ -426,6 +518,28 @@ public class Toolset {
         }
 
         return content;
+    }
+
+    /**
+     * Method to replace Properties in a file
+     *
+     * @param prooperties
+     * @param path
+     * @throws Exception
+     */
+    public void replaceProperties(Properties prooperties, String path) throws Exception {
+        replaceProperties(prooperties, path, path);
+    }
+
+    /**
+     * Method to replace Properties in a file
+     *
+     * @param prooperties
+     * @param file
+     * @throws Exception
+     */
+    public void replaceProperties(Properties prooperties, File file) throws Exception {
+        replaceProperties(prooperties, file, file);
     }
 
     /**
