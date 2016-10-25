@@ -17,6 +17,7 @@
 package com.devopology.tools;
 
 import com.devopology.tools.impl.ExecutionResultImpl;
+import com.devopology.tools.impl.ZipUtils;
 import org.apache.commons.exec.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -26,10 +27,7 @@ import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -247,12 +245,7 @@ public class Toolset {
      * @throws Exception
      */
     public String pwd() throws Exception {
-        String path = this.currentDirectory.getCanonicalPath();
-        if (path.endsWith("/.") || path.endsWith("\\.")) {
-            path = path.substring(0, path.length() - 2);
-        }
-
-        return path;
+        return this.currentDirectory.getCanonicalPath();
     }
 
     /**
@@ -268,7 +261,7 @@ public class Toolset {
             file = new File(pwd() + File.separator + path);
         }
 
-        return file.getCanonicalPath();
+        return file.getAbsolutePath();
     }
 
     /**
@@ -283,7 +276,7 @@ public class Toolset {
             file = new File(pwd() + File.separator + file.getName());
         }
         
-        return file.getCanonicalPath();
+        return file.getAbsolutePath();
     }
 
 
@@ -806,6 +799,10 @@ public class Toolset {
         executable = absoluteFile(executable);
         output("execute( " + executable.getCanonicalPath() + listToString(argumentList) + " )");
 
+        if (!exists(executable)) {
+            throw new Exception(executable + " doesn't exist !");
+        }
+
         EXIT_CODE = 0;
 
         CommandLine commandLine = new CommandLine(executable.getCanonicalPath());
@@ -832,7 +829,13 @@ public class Toolset {
         result.setExitCode(resultHandler.getExitValue());
         result.setContent(outputStream.toString());
 
-        EXIT_CODE = result.getExitCode();
+        String content = result.getContent();
+        content = content.trim();
+        if (content.length() > 0) {
+            println(result.getContent());
+        }
+
+        println("exit code = [" + result.getExitCode() + "]");
 
         return result;
     }
@@ -856,5 +859,20 @@ public class Toolset {
         if (EXIT_CODE != expectedExitCode) {
             throw new Exception("Expected exit code of " + expectedExitCode + " but execution returned " + EXIT_CODE);
         }
+    }
+
+    /**
+     * Method to zip a directory
+     *
+     * @param sourcePath
+     * @param zipFilename
+     * @throws Exception
+     */
+    public void zip(String sourcePath, String zipFilename) throws Exception {
+        sourcePath = absolutePath(sourcePath);
+        zipFilename = absolutePath(zipFilename);
+        output("zip( " + sourcePath + ", " + zipFilename + " )");
+
+        ZipUtils.zipFolder(absoluteFile(sourcePath), absoluteFile(zipFilename));
     }
 }
