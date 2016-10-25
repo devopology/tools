@@ -15,7 +15,7 @@ Over the course of ~20 years, dealing with various Java software applications, J
 3. You must master a new scripting language to become efficient using it
 3. Java code (for a Java shop) is easy to develop, debug, deploy, etc.
 
-With those "truths" (... at least in my mind ...) I set out to develop code to wrap a lot of common
+With those "truths" (... at least our my minds ...) we set out to develop code to wrap a lot of common
 functionality that would allow easy dev-op script functions.
 
 For example, the devopology toolset allows easy use of file operations (cp, mv, rmdir), JSON based processing, Properties based processing, Apache Commons Lang, Apache HttpClient, Apache Commons IO, and Apache Commons Exec ... plus any other Java functionality you require because you can easily write it in Java.
@@ -83,6 +83,46 @@ Compile the class using "javac -cp org.devopology.tools-toolset-1.0.0.jar MyScri
 Run the MyScript class using "java -cp org.devopology.tools-toolset-1.0.0.jar;. MyScript"
 
 **NOTE** : Scripts are provided in the project's scripts directory for the most normal and basic scenario (org.devopology.tools-toolset-1.0.0.jar in the current directory as the "script" source file. The "script" class defined in the root Java package.)
+
+# Caveats
+
+The biggest caveat is the lack of of shell wildcard expansion.
+
+For example ... 
+
+    <snip>
+    
+    execute(CP, "*", "/tmp");
+    
+    </snip>
+
+Doesn't work because the Linux shell expands the wildcards. (Windows is a different, but we currently aren't targeting Windows.)
+
+Even ...
+
+    <snip>
+    
+    execute(CP, "/tmp/somefile", ".");
+    
+    </snip>
+
+... will have problems, because the executable's concept of the current directory isn't the same as the Toolset's.
+
+# Work arounds
+
+The current work around for lack of shell expansion issue is to not use them or use pure Java code to list files, then convert to them to absolute paths. This should be addressed in a future version.
+
+The current work around for the lack of shell expansion for a relative directory is the use of the "absolutePath" method.
+
+For example ...
+
+    <snip>
+    
+    // absolutePath with convert the path to absolute
+    // based on the Toolset current working directory
+    execute(CP, "/tmp/somefile", absolutePath("."));
+    
+    </snip>
 
 # Beyond
 
