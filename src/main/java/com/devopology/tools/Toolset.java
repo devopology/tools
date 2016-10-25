@@ -26,10 +26,7 @@ import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -247,12 +244,7 @@ public class Toolset {
      * @throws Exception
      */
     public String pwd() throws Exception {
-        String path = this.currentDirectory.getCanonicalPath();
-        if (path.endsWith("/.") || path.endsWith("\\.")) {
-            path = path.substring(0, path.length() - 2);
-        }
-
-        return path;
+        return this.currentDirectory.getCanonicalPath();
     }
 
     /**
@@ -268,7 +260,7 @@ public class Toolset {
             file = new File(pwd() + File.separator + path);
         }
 
-        return file.getCanonicalPath();
+        return file.getAbsolutePath();
     }
 
     /**
@@ -283,7 +275,7 @@ public class Toolset {
             file = new File(pwd() + File.separator + file.getName());
         }
         
-        return file.getCanonicalPath();
+        return file.getAbsolutePath();
     }
 
 
