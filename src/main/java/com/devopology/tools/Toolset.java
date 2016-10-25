@@ -295,7 +295,7 @@ public class Toolset {
      * @throws Exception
      */
     public Properties loadProperties(String path) throws Exception {
-        return loadProperties(absolute(path));
+        return loadProperties(absoluteFile(path));
     }
 
     /**
