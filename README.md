@@ -58,14 +58,16 @@ Using Linux ...
 3. Clone the GIT repository
 4. Build the code using "mvn install"
 
-# Building UBER jar (jar with all dependencies - minuse those use for testing)
+# UBER jar
+
+The project include a Packager that will build an UBER jar (jar with all dependencies - minuse those use for testing.)
 
 Using Linux ...
 
 1. Build the project (steps above)
 5. execute  bash -e package-UBER.sh
 
-The resulting UBER jar will be located in target directory
+The resulting UBER jar will be located in target directory. The Packager class is part of the source code, so it's a good example of how do do things.
 
 # Using
 
