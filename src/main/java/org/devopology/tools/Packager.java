@@ -28,15 +28,15 @@ public class Packager extends Toolset {
         String projectBaseDirectory = args[0];
         String ubJarFilename = args[1];
 
-        // Disable logging for the initial cd since we
+        // Mute logging for the initial cd since we
         // need to get to the correct working directory
         // and don't want to log that step
-        setConfiguration(CONFIGURATION_LOG_ENABLED, "false");
+        setConfiguration(CONFIGURATION_LOGGER_MUTE, "true");
 
         cd(projectBaseDirectory);
 
-        // Re-enable logging
-        setConfiguration(CONFIGURATION_LOG_ENABLED, "true");
+        // Unmute logging
+        setConfiguration(CONFIGURATION_LOGGER_MUTE, "false");
 
         File uberJarFile = absoluteFile(ubJarFilename).getCanonicalFile();
 
@@ -44,7 +44,7 @@ public class Packager extends Toolset {
         info("");
         info("This may take a while ... We are merging all the dependencies into an UBER jar ... Please be patient ...");
 
-        setConfiguration(CONFIGURATION_LOG_ENABLED, "false");
+        setConfiguration(CONFIGURATION_LOGGER_MUTE, "true");
 
         cd("target");
         if (exists("uber")) {

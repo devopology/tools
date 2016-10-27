@@ -9,9 +9,8 @@ public class Test extends Toolset {
     }
 
     public void run(String [] args) throws Exception {
-        setConfiguration(Toolset.CONFIGURATION_LOG_SHOW_TIMESTAMPS, "true");
-
         info("Let's go ...");
+        setConfiguration(CONFIGURATION_LOGGER_MUTE, "true");
         info("pwd = [" + pwd() + "]");
         cd("C:/development");
         File file = absoluteFile();
