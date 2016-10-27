@@ -38,13 +38,14 @@ import java.util.regex.Pattern;
  */
 public class Toolset {
 
+    private final static String CLASS_NAME = Toolset.class.getName();
+
     private final static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     private final static JSONParser jsonParser = new JSONParser();
     private final static String TIMESTAMP_MESSAGE_SEPARATOR = " | ";
 
-    protected File currentDirectory = null;
-
-    public final static String EXECUTE_SHOW_CONTENT = "toolset.execute.showContent";
+    public final static String CONFIGURATION_EXECUTE_SHOW_CONTENT = CLASS_NAME + ".execute.showContent";
+    public final static String CONFIGURATION_LOG_SHOW_TIMESTAMPS = CLASS_NAME + ".log.showTimestamps";
 
     public final static String SYSTEMD_SERVICE_ROOT = "/lib/systemd/system";
 
@@ -72,7 +73,7 @@ public class Toolset {
     /**
      * Exit code of the last executable execution
      */
-    private static int EXIT_CODE = 0;
+    protected static int EXIT_CODE = 0;
 
     /**
      * File types
@@ -80,6 +81,11 @@ public class Toolset {
     public final static int NOT_FOUND = -1;
     public final static int DIRECTORY = 0;
     public final static int FILE = 1;
+
+    /**
+     * Track the current working directory
+     */
+    protected File currentWorkingDirectory = null;
 
     /**
      * Configuration
@@ -92,11 +98,7 @@ public class Toolset {
     public Toolset() {
         System.setErr(System.out);
         this.properties = new Properties();
-        this.currentDirectory = new File(".").getAbsoluteFile();
-    }
-
-    private void output(String message) {
-        System.out.println(simpleDateFormat.format(new Date()) + TIMESTAMP_MESSAGE_SEPARATOR + message);
+        this.currentWorkingDirectory = new File(".").getAbsoluteFile();
     }
 
     private static String listToString(List<String> list) {
@@ -258,7 +260,12 @@ public class Toolset {
      *
      * @param object
      */
-    public void println(Object object) {
+    public void info(Object object) {
+        log("INFO", object);
+    }
+
+    public void log(String category, Object object) {
+        boolean showTimestamps = "true".equals(getConfiguration(CONFIGURATION_LOG_SHOW_TIMESTAMPS, "false"));
         String message = null;
 
         if (null != object) {
@@ -271,7 +278,13 @@ public class Toolset {
 
             try {
                 while ((line = reader.readLine()) != null) {
-                    System.out.println(simpleDateFormat.format(new Date()) + TIMESTAMP_MESSAGE_SEPARATOR + "println( " + line + " )");
+
+                    if (showTimestamps) {
+                        System.out.println(simpleDateFormat.format(new Date()) + " [" + category + "] " + line);
+                    }
+                    else {
+                        System.out.println("[" + category + "] " + line);
+                    }
                 }
             }
             catch (IOException ioe) {
@@ -279,7 +292,12 @@ public class Toolset {
             }
         }
         else {
-            System.out.println(simpleDateFormat.format(new Date()) + TIMESTAMP_MESSAGE_SEPARATOR + "println( " + message + " )");
+            if (showTimestamps) {
+                System.out.println(simpleDateFormat.format(new Date()) + " [" + category + "] " + message);
+            }
+            else {
+                System.out.println("[" + category + "] " + message);
+            }
         }
     }
 
@@ -291,7 +309,7 @@ public class Toolset {
     public void cd(String path) {
         try {
             File file = absoluteFile(path);
-            output("cd( " + file.getCanonicalPath() + " )");
+            info("cd( " + file.getCanonicalPath() + " )");
 
             if (false == file.exists()) {
                 throw new IOException(path + " doesn't exist");
@@ -301,7 +319,7 @@ public class Toolset {
                 throw new IOException(path + " isn't a directory");
             }
 
-            this.currentDirectory = file.getAbsoluteFile();
+            this.currentWorkingDirectory = file.getAbsoluteFile();
         }
         catch (Throwable t) {
             throw new ToolsetException("cd() Exception ", t);
@@ -315,7 +333,7 @@ public class Toolset {
      */
     public String pwd() {
         try {
-            return this.currentDirectory.getCanonicalPath();
+            return this.currentWorkingDirectory.getCanonicalPath();
         }
         catch (Throwable t) {
             throw new ToolsetException("pwd() Exception ", t);
@@ -347,10 +365,18 @@ public class Toolset {
         if (!file.isAbsolute()) {
             file = new File(pwd() + File.separator + file.getName());
         }
-        
+
         return file.getAbsolutePath();
     }
 
+    /**
+     * Method to get an absolute File in the current working directory
+     *
+     * @return File
+     */
+    public File absoluteFile() {
+        return absoluteFile(".");
+    }
 
     /**
      * Method to get an absolute File
@@ -394,10 +420,10 @@ public class Toolset {
     public void mkdirs(String path) {
         try {
             File file = absoluteFile(path);
-            output("mkdir( " + file.getCanonicalPath() + " )");
+            info("mkdir( " + file.getCanonicalPath() + " )");
             if (!file.exists()) {
                 if (!file.mkdirs()) {
-                    throw new ToolsetException("mkdirs() Exception : can't create output directory");
+                    throw new ToolsetException("mkdirs() Exception : can't create info directory");
                 }
             }
         }
@@ -412,7 +438,7 @@ public class Toolset {
     public void rm(String path) {
         try {
             File file = absoluteFile(path);
-            output("rm( " + file.getCanonicalPath() + ")");
+            info("rm( " + file.getCanonicalPath() + ")");
 
             if (file.exists()) {
                 if (file.isFile()) {
@@ -440,7 +466,7 @@ public class Toolset {
     public void rmdir(String path) {
         try {
             File file = absoluteFile(path);
-            output("rmdir( " + file.getCanonicalPath() + " )");
+            info("rmdir( " + file.getCanonicalPath() + " )");
             FileUtils.deleteDirectory(file);
         }
         catch (ToolsetException te) {
@@ -460,7 +486,7 @@ public class Toolset {
     public Properties loadProperties(String path) {
         try {
             File file = absoluteFile(path);
-            output("loadProperties( " + file.getCanonicalPath() + " )");
+            info("loadProperties( " + file.getCanonicalPath() + " )");
             Properties properties = new Properties();
             properties.load(new FileReader(path));
             return properties;
@@ -490,14 +516,14 @@ public class Toolset {
         try {
             File file = new File(absolutePath(path));
             if (!file.exists()) {
-                output("type( " + path + " ) = NOT_FOUND");
+                info("type( " + path + " ) = NOT_FOUND");
                 return NOT_FOUND;
             }
             else if (file.isDirectory()) {
-                output("type( " + file.getCanonicalPath() + " ) = DIRECTORY");
+                info("type( " + file.getCanonicalPath() + " ) = DIRECTORY");
                 return DIRECTORY;
             } else {
-                output("type( " + file.getCanonicalPath() + " ) = FILE");
+                info("type( " + file.getCanonicalPath() + " ) = FILE");
                 return FILE;
             }
         }
@@ -516,7 +542,7 @@ public class Toolset {
         try {
             File oldFile = absoluteFile(oldPath);
             File newFile = absoluteFile(newPath);
-            output("rename( " + oldFile.getCanonicalPath() + ", " + newFile.getCanonicalPath() + " )");
+            info("rename( " + oldFile.getCanonicalPath() + ", " + newFile.getCanonicalPath() + " )");
             oldFile.renameTo(newFile);
         }
         catch (Throwable t) {
@@ -528,7 +554,7 @@ public class Toolset {
         try {
             List<String> result = new ArrayList<String>();
             File file = absoluteFile(path);
-            output("listFiles( " + file.getCanonicalPath() + " )");
+            info("listFiles( " + file.getCanonicalPath() + " )");
 
             File [] files = file.listFiles();
             if (null != files) {
@@ -555,7 +581,7 @@ public class Toolset {
         try {
             List<String> result = new ArrayList<String>();
             File file = absoluteFile(path);
-            output("recursivelyListFiles( " + file.getCanonicalPath() + " )");
+            info("recursivelyListFiles( " + file.getCanonicalPath() + " )");
 
             if (file.isDirectory()) {
                 File [] children = file.listFiles();
@@ -607,7 +633,7 @@ public class Toolset {
                 throw new RuntimeException("Developer error!!!");
             }
 
-            output("typeString( " + file.getCanonicalPath() + " ) = " + result);
+            info("typeString( " + file.getCanonicalPath() + " ) = " + result);
 
             return result;
         }
@@ -623,7 +649,7 @@ public class Toolset {
      * @return String
      */
     public String replaceProperties(String content) {
-        println("replaceProperties( [properties] )");
+        info("replaceProperties( [properties] )");
         Iterator<Map.Entry<Object, Object>> iterator = properties.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Object, Object> entry = iterator.next();
@@ -651,13 +677,13 @@ public class Toolset {
      *
      * @param properties
      * @param inputFilePath
-     * @param outputFilePath
+     * @param infoFilePath
      */
-    public void replaceProperties(Properties properties, String inputFilePath, String outputFilePath) {
+    public void replaceProperties(Properties properties, String inputFilePath, String infoFilePath) {
         try {
             File inputFile = absoluteFile(inputFilePath);
-            File outputFile = absoluteFile(outputFilePath);
-            output("replaceProperties( [properties], " + inputFile.getCanonicalPath() + ", " + outputFile.getCanonicalPath() + " )");
+            File infoFile = absoluteFile(infoFilePath);
+            info("replaceProperties( [properties], " + inputFile.getCanonicalPath() + ", " + infoFile.getCanonicalPath() + " )");
             String content = readFile(inputFile.getCanonicalPath());
 
             Iterator<Map.Entry<Object, Object>> iterator = properties.entrySet().iterator();
@@ -669,7 +695,7 @@ public class Toolset {
                 content = content.replaceAll(Pattern.quote("${" + key + "}"), value);
             }
 
-            writeFile(outputFile.getCanonicalPath(), content);
+            writeFile(infoFile.getCanonicalPath(), content);
         }
         catch (Throwable t) {
             throw new ToolsetException("typeString() Exception ", t);
@@ -700,7 +726,7 @@ public class Toolset {
     public void writeFile(String path, String content) {
         try {
             File file = absoluteFile(path);
-            output("writeFile( " + file.getCanonicalPath() + ", [getContent])");
+            info("writeFile( " + file.getCanonicalPath() + ", [getContent])");
 
             PrintWriter printWriter = new PrintWriter(file);
             printWriter.print(content);
@@ -719,7 +745,7 @@ public class Toolset {
      */
     public JSONObject parseJSONObject(String json) {
         try {
-            output("parseJSONObject( [json] )");
+            info("parseJSONObject( [json] )");
             return (JSONObject) jsonParser.parse(
                     json,
                     new ContainerFactory() {
@@ -748,7 +774,7 @@ public class Toolset {
     public JSONObject loadJSONObject(String path) {
         try {
             File file = absoluteFile(path);
-            output("loadJSONObject( " + file.getCanonicalPath() + " )");
+            info("loadJSONObject( " + file.getCanonicalPath() + " )");
             return (JSONObject) jsonParser.parse(
                     new FileReader(file),
                     new ContainerFactory() {
@@ -776,7 +802,7 @@ public class Toolset {
      */
     public JSONArray parseJSONArray(String json) {
         try {
-            output("parseJSONArray( [json] )");
+            info("parseJSONArray( [json] )");
             return (JSONArray) jsonParser.parse(
                     json,
                     new ContainerFactory() {
@@ -805,7 +831,7 @@ public class Toolset {
     public JSONArray loadJSONArray(String path) {
         try {
             File file = absoluteFile(path);
-            output("loadJSONArray( " + file.getCanonicalPath() + " )");
+            info("loadJSONArray( " + file.getCanonicalPath() + " )");
             return (JSONArray) jsonParser.parse(
                     new FileReader(file),
                     new ContainerFactory() {
@@ -873,7 +899,7 @@ public class Toolset {
                 }
             }
 
-            output("execute( " + executable + ", " + arrayToString(arguments) + " )");
+            info("execute( " + executable + ", " + arrayToString(arguments) + " )");
 
             EXIT_CODE = 0;
 
@@ -901,11 +927,11 @@ public class Toolset {
             result.setExitCode(resultHandler.getExitValue());
             result.setContent(outputStream.toString());
 
-            if ("true".equals(getConfiguration(EXECUTE_SHOW_CONTENT, "false"))) {
+            if ("true".equals(getConfiguration(CONFIGURATION_EXECUTE_SHOW_CONTENT, "false"))) {
                 String content = result.getContent();
                 content = content.trim();
                 if (content.length() > 0) {
-                    println(result.getContent());
+                    info(result.getContent());
                 }
             }
 
@@ -952,11 +978,11 @@ public class Toolset {
 
             if (!zipFile.getParentFile().exists()) {
                 if (!zipFile.getParentFile().mkdirs()) {
-                    throw new ToolsetException("zip() Exception : can't create output directory path");
+                    throw new ToolsetException("zip() Exception : can't create info directory path");
                 }
             }
 
-            output("zip( " + sourceFile.getCanonicalFile() + ", " + zipFile.getCanonicalPath() + " )");
+            info("zip( " + sourceFile.getCanonicalFile() + ", " + zipFile.getCanonicalPath() + " )");
             ZipUtils.zipFolder(sourceFile.getCanonicalFile(), zipFile.getCanonicalFile());
         }
         catch (ToolsetException te) {
@@ -988,7 +1014,7 @@ public class Toolset {
         try {
             zipFilename = absolutePath(zipFilename);
             File destinationFile = absoluteFile(destinationPath);
-            output("unzip( " + zipFilename + ", " + destinationFile.getCanonicalPath() + " )");
+            info("unzip( " + zipFilename + ", " + destinationFile.getCanonicalPath() + " )");
 
             if (overwrite) {
                 if (exists(destinationPath)) {

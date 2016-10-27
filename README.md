@@ -53,25 +53,17 @@ One unique feature is that the Toolset class has a concept of a "current directo
 
 Using Linux ...
 
-1. Setup a Java 1.7 JDK
-2. Setup Maven
+1. Setup a Java JDK (1.7 or later)
+2. Setup Maven3 (3.3.x or later)
 3. Clone the GIT repository
 4. From the project root, build the code using "mvn install"
 
-# UBER jar
-
-The project includes a "packager" that will build an UBER jar (jar with all dependencies - minus those used for testing.) The Packager class is part of the source code, so it's a good example of how to do things.
-
-Using Linux ...
-
-1. Build the project (steps above)
-5. From the project root, build the UBER jar using "bash -e package-UBER.sh"
-
-The resulting UBER jar will be located in the target directory. 
-
 # Using
 
-You will need the output tools-toolset-1.0.0.jar along with with the other dependency jars in the lib directory.ipt" source file will be located.
+The Maven project will produce both a project jar ( org.devopology.tools-1.0.0.jar ) without dependencies and an "UBER" jar ( org.devopology.tools-1.0.0-UBER.jar ) with all dependencies included.
+
+In most all circumstances you will want to use the UBER jar. 
+
 
 Create a new Java class called MyScript in MyScript.java that extends Toolset ...
 
