@@ -60,7 +60,7 @@ Using Linux ...
 
 # UBER jar
 
-The project includes a "packager" that will build an UBER jar (jar with all dependencies - minuse those use for testing.) The Packager class is part of the source code, so it's a good example of how do do things.
+The project includes a "packager" that will build an UBER jar (jar with all dependencies - minus those used for testing.) The Packager class is part of the source code, so it's a good example of how do do things.
 
 Using Linux ...
 
