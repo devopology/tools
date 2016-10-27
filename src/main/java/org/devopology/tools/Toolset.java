@@ -16,20 +16,21 @@
 
 package org.devopology.tools;
 
-import org.devopology.tools.impl.ExecutionResultImpl;
-import org.devopology.tools.impl.ZipUtils;
 import net.lingala.zip4j.core.ZipFile;
 import org.apache.commons.exec.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.devopology.tools.impl.ExecutionResultImpl;
+import org.devopology.tools.impl.SimpleLogger;
+import org.devopology.tools.impl.ZipUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -39,15 +40,15 @@ import java.util.regex.Pattern;
 public class Toolset {
 
     private final static String CLASS_NAME = Toolset.class.getName();
-
-    private final static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    private final static SimpleLogger logger = new SimpleLogger(CLASS_NAME);
     private final static JSONParser jsonParser = new JSONParser();
-    private final static String TIMESTAMP_MESSAGE_SEPARATOR = " | ";
 
+    public final static String CONFIGURATION_LOGGER_MUTE = CLASS_NAME + ".mute";
     public final static String CONFIGURATION_EXECUTE_SHOW_CONTENT = CLASS_NAME + ".execute.showContent";
-    public final static String CONFIGURATION_LOG_ENABLED = CLASS_NAME + ".log.enabled";
-    public final static String CONFIGURATION_LOG_SHOW_TIMESTAMPS = CLASS_NAME + ".log.showTimestamps";
 
+    /**
+     * Systemd root path for service files
+     */
     public final static String SYSTEMD_SERVICE_ROOT = "/lib/systemd/system";
 
     /**
@@ -97,9 +98,19 @@ public class Toolset {
      * Constructor
      */
     public Toolset() {
-        System.setErr(System.out);
         this.properties = new Properties();
         this.currentWorkingDirectory = new File(".").getAbsoluteFile();
+
+        setConfiguration("org.slf4j.simpleLogger.defaultLogLevel", "info");
+        setConfiguration("org.slf4j.simpleLogger.showDateTime", "false");
+        setConfiguration("org.slf4j.simpleLogger.showThreadName", "false");
+        setConfiguration("org.slf4j.simpleLogger.showLogName", "false");
+        setConfiguration("org.slf4j.simpleLogger.logFile", "System.out");
+        setConfiguration("org.slf4j.simpleLogger.levelInBrackets", "true");
+        setConfiguration("org.slf4j.simpleLogger.log.Sisu", "info");
+        setConfiguration("org.slf4j.simpleLogger.warnLevelString", "WARNING");
+
+        logger.init(properties);
     }
 
     private static String listToString(List<String> list) {
@@ -164,6 +175,10 @@ public class Toolset {
      */
     public void setConfiguration(String key, String value) {
         properties.setProperty(key, value);
+
+        if (key.startsWith(SimpleLogger.SYSTEM_PREFIX)) {
+            logger.init(properties);
+        }
     }
 
     /**
@@ -173,10 +188,11 @@ public class Toolset {
      */
     public void setConfiguration(Properties properties) {
         if (null == properties) {
-            properties = new Properties();
+            throw new ToolsetException("setConfiguration() Exception : properties is null");
         }
 
-        this.properties = properties;
+        this.properties.clear();
+        mergeConfiguration(properties);
     }
 
     /**
@@ -187,16 +203,9 @@ public class Toolset {
     public void mergeConfiguration(Properties properties) {
         if (null != properties) {
             for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-                this.properties.setProperty((String) entry.getKey(), (String) entry.getValue());
+                setConfiguration((String) entry.getKey(), (String) entry.getValue());
             }
         }
-    }
-
-    /**
-     * Method to clear configuration Properties
-     */
-    public void clearConfiguration() {
-        this.properties.clear();
     }
 
     /**
@@ -257,57 +266,63 @@ public class Toolset {
     }
 
     /**
-     * Method to print a line
+     * Method to get the slf4j Logger
+     *
+     * @return
+     */
+    public Logger getLogger() {
+        return logger;
+    }
+
+    /**
+     * Method to log a debug message
+     *
+     * @param object
+     */
+    public void debug(Object object) {
+        if ("false".equals(getConfiguration(CONFIGURATION_LOGGER_MUTE, "false"))) {
+            logger.debug(object.toString());
+        }
+    }
+
+    /**
+     * Method to log a trace message
+     *
+     * @param object
+     */
+    public void trace(Object object) {
+        if ("false".equals(getConfiguration(CONFIGURATION_LOGGER_MUTE, "false"))) {
+            logger.trace(object.toString());
+        }
+    }
+
+    /**
+     * Method to log an info message
      *
      * @param object
      */
     public void info(Object object) {
-        log("INFO", object);
-    }
-
-    public void log(String category, Object object) {
-        boolean logEnabled = "true".equals(getConfiguration(CONFIGURATION_LOG_ENABLED, "true"));
-
-        if (logEnabled) {
-            boolean showTimestamps = "true".equals(getConfiguration(CONFIGURATION_LOG_SHOW_TIMESTAMPS, "false"));
-            String message = null;
-
-            if (null != object) {
-                message = object.toString();
-            }
-
-            if ((null != message) && ((message.indexOf("\r") != -1) || (message.indexOf("\n") != -1))) {
-                String line = null;
-                BufferedReader reader = new BufferedReader(new StringReader(message));
-
-                try {
-                    while ((line = reader.readLine()) != null) {
-
-                        if (showTimestamps) {
-                            System.out.println(simpleDateFormat.format(new Date()) + " [" + category + "] " + line);
-                        } else {
-                            System.out.println("[" + category + "] " + line);
-                        }
-                    }
-                } catch (IOException ioe) {
-                    throw new RuntimeException(ioe);
-                }
-            } else {
-                if (showTimestamps) {
-                    System.out.println(simpleDateFormat.format(new Date()) + " [" + category + "] " + message);
-                } else {
-                    System.out.println("[" + category + "] " + message);
-                }
-            }
+        if ("false".equals(getConfiguration(CONFIGURATION_LOGGER_MUTE, "false"))) {
+            logger.info(object.toString());
         }
     }
 
-    public void out(Object message) {
-        boolean logEnabled = "true".equals(getConfiguration(CONFIGURATION_LOG_ENABLED, "true"));
+    /**
+     * Method to log a warning warning
+     *
+     * @param object
+     */
+    public void warn(Object object) {
+        logger.warn(object.toString());
+    }
 
-        if (logEnabled) {
-            System.out.print(message);
-        }
+    /**
+     * Method to log an error error message
+     *
+     * @param object
+     */
+    public void error(Object object) {
+        logger.error(object.toString());
     }
 
     /**
