@@ -67,7 +67,7 @@ Using Linux ...
 1. Build the project (steps above)
 5. From the project root, build the UBER jar using "bash -e package-UBER.sh"
 
-The resulting UBER jar will be located in target directory. 
+The resulting UBER jar will be located in the target directory. 
 
 # Using
 
