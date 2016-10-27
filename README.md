@@ -58,12 +58,11 @@ Using Linux ...
 3. Clone the GIT repository
 4. From the project root, build the code using "mvn install"
 
-# Using
+# Using / Examples
 
-The Maven project will produce both a project jar ( org.devopology.tools-1.0.0.jar ) without dependencies and an "UBER" jar ( org.devopology.tools-1.0.0-UBER.jar ) with all dependencies included.
+The Maven project will produce both a project jar ( org.devopology.tools-1.0.0.jar ) without dependencies and an "UBER" jar ( org.devopology.tools-1.0.0-UBER.jar ) with all dependencies included. In most circumstances you will want to use the UBER jar.
 
-In most all circumstances you will want to use the UBER jar. 
-
+The UBER jar is built by the include Packager class (which is written using the Toolset class), along with the exec-maven-plugin ( http://www.mojohaus.org/exec-maven-plugin/ )
 
 Create a new Java class called MyScript in MyScript.java that extends Toolset ...
 
