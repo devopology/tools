@@ -556,6 +556,19 @@ public class Toolset {
         }
     }
 
+    public void copy(String sourcePath, String destinationPath) {
+        try {
+            File sourceFile = absoluteFile(sourcePath);
+            File destinationFile = absoluteFile(destinationPath);
+            info("copy( " + sourceFile.getCanonicalPath() + ", " + destinationFile.getCanonicalPath() + " )");
+
+            FileUtils.copyFile(sourceFile, destinationFile);
+        }
+        catch (Throwable t) {
+            throw new ToolsetException("type() Exception ", t);
+        }
+    }
+
     /**
      * Method to rename a file
      *
