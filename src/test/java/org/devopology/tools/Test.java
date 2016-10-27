@@ -18,7 +18,7 @@ public class Test extends Toolset {
         cd("git");
         info("pwd = [" + pwd() + "]");
         file = absoluteFile();
-        info("flie = [" + file.getCanonicalPath() + "]");
+        info("file = [" + file.getCanonicalPath() + "]");
         info("Done.");
     }
 }
