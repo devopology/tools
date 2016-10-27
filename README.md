@@ -56,7 +56,7 @@ Using Linux ...
 1. Setup a Java 1.7 JDK
 2. Setup Maven
 3. Clone the GIT repository
-4. Build the code using "mvn install"
+4. From the project root, build the code using "mvn install"
 
 # UBER jar
 
@@ -65,7 +65,7 @@ The project includes a "packager" that will build an UBER jar (jar with all depe
 Using Linux ...
 
 1. Build the project (steps above)
-5. execute  bash -e package-UBER.sh
+5. From the project root, build the UBER jar using "bash -e package-UBER.sh"
 
 The resulting UBER jar will be located in target directory. 
 
