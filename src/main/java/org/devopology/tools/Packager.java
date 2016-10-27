@@ -25,8 +25,26 @@ public class Packager extends Toolset {
     }
 
     public void run(String [] args) throws Exception {
-        // args[0] is the project directory root
-        cd(args[0]);
+        String projectBaseDirectory = args[0];
+        String ubJarFilename = args[1];
+
+        // Disable logging for the initial cd since we
+        // need to get to the correct working directory
+        // and don't want to log that step
+        setConfiguration(CONFIGURATION_LOG_ENABLED, "false");
+
+        cd(projectBaseDirectory);
+
+        // Re-enable logging
+        setConfiguration(CONFIGURATION_LOG_ENABLED, "true");
+
+        File uberJarFile = absoluteFile(ubJarFilename).getCanonicalFile();
+
+        info("Building UBER jar : " + uberJarFile.getCanonicalPath());
+        info("");
+        info("This may take a while ... We are merging all the dependencies into an UBER jar ... Please be patient ...");
+
+        setConfiguration(CONFIGURATION_LOG_ENABLED, "false");
 
         cd("target");
         if (exists("uber")) {
@@ -54,9 +72,9 @@ public class Packager extends Toolset {
         }
 
         cd("..");
-        rmdir("uber/classes/junit");
-        rmdir("uber/classes/org/hamcrest");
-        zip("uber/classes", "org.devopology.tools.1.0.0-UBER.jar");
+        //rmdir("uber/classes/junit");
+        //rmdir("uber/classes/org/hamcrest");
+        zip("uber/classes", uberJarFile.getCanonicalPath());
 
         cd("uber");
         files = listFiles(".").toArray(new String [0]);
@@ -65,7 +83,5 @@ public class Packager extends Toolset {
                 rmdir(absolutePath(filename));
             }
         }
-
-        info("Done.");
     }
 }

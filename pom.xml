@@ -140,6 +140,7 @@
                     <mainClass>org.devopology.tools.Packager</mainClass>
                     <arguments>
                         <argument>${project.basedir}</argument>
+                        <argument>${project.build.directory}/${project.groupId}.${project.name}-${project.version}-UBER.jar</argument>
                     </arguments>
                 </configuration>
             </plugin>
