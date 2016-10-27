@@ -45,6 +45,7 @@ public class Toolset {
     private final static String TIMESTAMP_MESSAGE_SEPARATOR = " | ";
 
     public final static String CONFIGURATION_EXECUTE_SHOW_CONTENT = CLASS_NAME + ".execute.showContent";
+    public final static String CONFIGURATION_LOG_ENABLED = CLASS_NAME + ".log.enabled";
     public final static String CONFIGURATION_LOG_SHOW_TIMESTAMPS = CLASS_NAME + ".log.showTimestamps";
 
     public final static String SYSTEMD_SERVICE_ROOT = "/lib/systemd/system";
@@ -265,39 +266,47 @@ public class Toolset {
     }
 
     public void log(String category, Object object) {
-        boolean showTimestamps = "true".equals(getConfiguration(CONFIGURATION_LOG_SHOW_TIMESTAMPS, "false"));
-        String message = null;
+        boolean logEnabled = "true".equals(getConfiguration(CONFIGURATION_LOG_ENABLED, "true"));
 
-        if (null != object) {
-            message = object.toString();
-        }
+        if (logEnabled) {
+            boolean showTimestamps = "true".equals(getConfiguration(CONFIGURATION_LOG_SHOW_TIMESTAMPS, "false"));
+            String message = null;
 
-        if ((null != message) && ((message.indexOf("\r") != -1) || (message.indexOf("\n") != -1))) {
-            String line = null;
-            BufferedReader reader = new BufferedReader(new StringReader(message));
+            if (null != object) {
+                message = object.toString();
+            }
 
-            try {
-                while ((line = reader.readLine()) != null) {
+            if ((null != message) && ((message.indexOf("\r") != -1) || (message.indexOf("\n") != -1))) {
+                String line = null;
+                BufferedReader reader = new BufferedReader(new StringReader(message));
 
-                    if (showTimestamps) {
-                        System.out.println(simpleDateFormat.format(new Date()) + " [" + category + "] " + line);
+                try {
+                    while ((line = reader.readLine()) != null) {
+
+                        if (showTimestamps) {
+                            System.out.println(simpleDateFormat.format(new Date()) + " [" + category + "] " + line);
+                        } else {
+                            System.out.println("[" + category + "] " + line);
+                        }
                     }
-                    else {
-                        System.out.println("[" + category + "] " + line);
-                    }
+                } catch (IOException ioe) {
+                    throw new RuntimeException(ioe);
+                }
+            } else {
+                if (showTimestamps) {
+                    System.out.println(simpleDateFormat.format(new Date()) + " [" + category + "] " + message);
+                } else {
+                    System.out.println("[" + category + "] " + message);
                 }
             }
-            catch (IOException ioe) {
-                throw new RuntimeException(ioe);
-            }
         }
-        else {
-            if (showTimestamps) {
-                System.out.println(simpleDateFormat.format(new Date()) + " [" + category + "] " + message);
-            }
-            else {
-                System.out.println("[" + category + "] " + message);
-            }
+    }
+
+    public void out(Object message) {
+        boolean logEnabled = "true".equals(getConfiguration(CONFIGURATION_LOG_ENABLED, "true"));
+
+        if (logEnabled) {
+            System.out.print(message);
         }
     }
 
