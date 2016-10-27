@@ -51,12 +51,21 @@ One unique feature is that the Toolset class has a concept of a "current directo
 
 # Building
 
-To build ..
+Using Linux ...
 
-1. Setup a Java 1.8 JDK
+1. Setup a Java 1.7 JDK
 2. Setup Maven
 3. Clone the GIT repository
 4. Build the code using "mvn install"
+
+# Building UBER jar (jar with all dependencies - minuse those use for testing)
+
+Using Linux ...
+
+1. Build the project (steps above)
+5. execute  bash -e package-UBER.sh
+
+The resulting UBER jar will be located in target directory
 
 # Using
 
