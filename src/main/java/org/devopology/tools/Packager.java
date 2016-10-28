@@ -33,7 +33,7 @@ public class Packager extends Toolset {
         // and don't want to log that step
         setConfiguration(CONFIGURATION_LOGGER_MUTE, "true");
 
-        cd(projectBaseDirectory);
+        changeDirectory(projectBaseDirectory);
 
         // Unmute logging
         setConfiguration(CONFIGURATION_LOGGER_MUTE, "false");
@@ -46,20 +46,20 @@ public class Packager extends Toolset {
 
         setConfiguration(CONFIGURATION_LOGGER_MUTE, "true");
 
-        cd("target");
+        changeDirectory("target");
         if (exists("uber")) {
-            rmdir("uber");
+            deleteDirectory("uber");
         }
 
-        mkdirs("uber");
-        mkdirs("uber/classes");
-        mkdirs("uber/tmp");
+        forceMkdir("uber");
+        forceMkdir("uber/classes");
+        forceMkdir("uber/tmp");
 
         zip("classes", "uber/tmp/1.zip");
         unzip("uber/tmp/1.zip", "uber/classes");
-        rm("uber/tmp/1.zip");
+        deleteDirectory("uber/tmp/1.zip");
 
-        cd("lib");
+        changeDirectory("lib");
         String [] files = absoluteFile(pwd()).list();
         if (null != files) {
             for (String filename : files) {
@@ -71,16 +71,16 @@ public class Packager extends Toolset {
             }
         }
 
-        cd("..");
+        changeDirectory("..");
         //rmdir("uber/classes/junit");
         //rmdir("uber/classes/org/hamcrest");
         zip("uber/classes", uberJarFile.getCanonicalPath());
 
-        cd("uber");
+        changeDirectory("uber");
         files = listFiles(".").toArray(new String [0]);
         for (String filename : files) {
             if (!noPath(filename).equals("classes")) {
-                rmdir(absolutePath(filename));
+                deleteDirectory(absolutePath(filename));
             }
         }
     }
