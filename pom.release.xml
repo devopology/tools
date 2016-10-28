@@ -6,7 +6,7 @@
 
     <groupId>org.devopology</groupId>
     <artifactId>org.devopology.tools</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
     <name>tools</name>
     <description>Code to encapsulate common functionality for simple operations</description>
@@ -31,7 +31,7 @@
     <scm>
         <connection>scm:git:git://github.com/devopology/tools.git</connection>
         <developerConnection>scm:git:ssh://github.com/devopology/tools.git</developerConnection>
-        <url>https://github.com/devopology/tools/tree/release-1.0.0</url>
+        <url>https://github.com/devopology/tools/tree/release-1.1.0</url>
     </scm>
 
     <distributionManagement>
@@ -132,7 +132,7 @@
                 <configuration>
                     <serverId>ossrh</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
         </plugins>
