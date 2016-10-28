@@ -17,6 +17,7 @@
 package org.devopology.tools;
 
 import net.lingala.zip4j.core.ZipFile;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.exec.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -43,9 +44,6 @@ public class Toolset {
     private final static String CLASS_NAME = Toolset.class.getName();
     private final static SimpleLogger logger = new SimpleLogger(CLASS_NAME);
     private final static JSONParser jsonParser = new JSONParser();
-
-    public final static String CONFIGURATION_LOGGER_MUTE_METHODS = CLASS_NAME + ".muteMethods";
-    public final static String CONFIGURATION_EXECUTE_SHOW_CONTENT = CLASS_NAME + ".execute.showContent";
 
     /**
      * Systemd root path for service files
@@ -170,31 +168,6 @@ public class Toolset {
 
     private File absoluteFile(File file) {
         return absoluteFile(file.getPath());
-    }
-
-    private void methodLog(String methodName, Object ... objects) {
-        boolean muteMethodLog = "true".equals(getConfiguration(CONFIGURATION_LOGGER_MUTE_METHODS, "false"));
-
-        if (muteMethodLog) {
-            return;
-        }
-
-        StringBuilder builder = new StringBuilder();
-        builder.append(methodName);
-        builder.append("( ");
-
-        if (null != objects) {
-            for (int i=0; i<objects.length; i++) {
-                if (i > 0) {
-                    builder.append(", ");
-                }
-
-                builder.append(objects[i].toString());
-            }
-        }
-
-        builder.append(" )");
-        info(builder.toString());
     }
 
     /**
@@ -389,7 +362,6 @@ public class Toolset {
     public void changeDirectory(String path) {
         try {
             File file = absoluteFile(path);
-            methodLog("changeDirectory", file);
 
             if (false == file.exists()) {
                 throw new IOException(path + " doesn't exist");
@@ -889,14 +861,6 @@ public class Toolset {
             result.setExitCode(resultHandler.getExitValue());
             result.setContent(outputStream.toString());
 
-            if ("true".equals(getConfiguration(CONFIGURATION_EXECUTE_SHOW_CONTENT, "false"))) {
-                String content = result.getContent();
-                content = content.trim();
-                if (content.length() > 0) {
-                    info(result.getContent());
-                }
-            }
-
             return result;
         }
         catch (ToolsetException te) {
@@ -1181,10 +1145,9 @@ public class Toolset {
         }
     }
 
-    public long checksumCRC32(String file) {
+    public long checkSumCRC32(String file) {
         try {
             File fileFile = absoluteFile(file);
-            methodLog("checksumCRC32", file);
             return FileUtils.checksumCRC32(absoluteFile(file));
         }
         catch (Throwable t) {
@@ -1192,9 +1155,68 @@ public class Toolset {
         }
     }
 
+    public String checkSumMD5(String file) {
+        BufferedInputStream bufferedInputStream = null;
+        try {
+            bufferedInputStream = new BufferedInputStream(new FileInputStream(absoluteFile(file)));
+            return DigestUtils.md5Hex(bufferedInputStream);
+        }
+        catch (Throwable t) {
+            throw new ToolsetException("moveDirectoryToDirectory() Exception ", t);
+        }
+        finally {
+            if (null != bufferedInputStream) {
+                try {
+                    bufferedInputStream.close();
+                } catch (Throwable t) {
+                    // DO NOTHING
+                }
+            }
+        }
+    }
+
+    public String checkSumSHA1(String file) {
+        BufferedInputStream bufferedInputStream = null;
+        try {
+            bufferedInputStream = new BufferedInputStream(new FileInputStream(absoluteFile(file)));
+            return DigestUtils.sha1Hex(bufferedInputStream);
+        }
+        catch (Throwable t) {
+            throw new ToolsetException("moveDirectoryToDirectory() Exception ", t);
+        }
+        finally {
+            if (null != bufferedInputStream) {
+                try {
+                    bufferedInputStream.close();
+                } catch (Throwable t) {
+                    // DO NOTHING
+                }
+            }
+        }
+    }
+
+    public String checkSumSHA256(String file) {
+        BufferedInputStream bufferedInputStream = null;
+        try {
+            bufferedInputStream = new BufferedInputStream(new FileInputStream(absoluteFile(file)));
+            return DigestUtils.sha256Hex(bufferedInputStream);
+        }
+        catch (Throwable t) {
+            throw new ToolsetException("moveDirectoryToDirectory() Exception ", t);
+        }
+        finally {
+            if (null != bufferedInputStream) {
+                try {
+                    bufferedInputStream.close();
+                } catch (Throwable t) {
+                    // DO NOTHING
+                }
+            }
+        }
+    }
+
     public void moveDirectory(String srcDir, String destDir) {
         try {
-            // TODO logMethod
             FileUtils.moveDirectory(absoluteFile(srcDir), absoluteFile(destDir));
         }
         catch (Throwable t) {
@@ -1206,7 +1228,6 @@ public class Toolset {
         try {
             File srcFile = absoluteFile(src);
             File destDirFile = absoluteFile(destDir);
-            methodLog("moveDirectoryToDirectory", srcFile, destDirFile, createDestDir);
             FileUtils.moveDirectoryToDirectory(srcFile, destDirFile, createDestDir);
         }
         catch (Throwable t) {
@@ -1218,7 +1239,6 @@ public class Toolset {
         try {
             File srcFileFile = absoluteFile(srcFile);
             File destFileFile = absoluteFile(destFile);
-            methodLog("moveFile", srcFileFile, destFileFile);
             FileUtils.moveFile(srcFileFile, destFileFile);
         }
         catch (Throwable t) {
@@ -1230,7 +1250,6 @@ public class Toolset {
         try {
             File srcFile = absoluteFile(src);
             File destDirFile = absoluteFile(destDir);
-            methodLog("moveFileToDirectory", srcFile, destDirFile, createDestDir);
             FileUtils.moveFileToDirectory(srcFile, destDirFile, createDestDir);
         }
         catch (Throwable t) {
@@ -1242,7 +1261,6 @@ public class Toolset {
         try {
             File srcFile = absoluteFile(src);
             File destDirFile = absoluteFile(destDir);
-            methodLog("moveToDirectory", srcFile, destDirFile, createDestDir);
             FileUtils.moveToDirectory(srcFile, destDirFile, createDestDir);
         }
         catch (Throwable t) {

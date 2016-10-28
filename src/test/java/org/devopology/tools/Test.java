@@ -10,8 +10,6 @@ public class Test extends Toolset {
 
     public void run(String [] args) throws Exception {
         info("Let's go ...");
-        //setConfiguration(CONFIGURATION_LOGGER_MUTE, "true");
-        setConfiguration(CONFIGURATION_LOGGER_MUTE_METHODS, "true");
         info("pwd = [" + pwd() + "]");
         changeDirectory("C:/development");
         File file = absoluteFile();
@@ -20,8 +18,16 @@ public class Test extends Toolset {
         info("pwd = [" + pwd() + "]");
         file = absoluteFile();
         info("file = [" + file.getCanonicalPath() + "]");
-        long crc32 = checksumCRC32("C:/ffmpeg.exe");
+
+        long crc32 = checkSumCRC32("C:/ffmpeg.exe");
         info("crc32 = [" + crc32 + "]");
+
+        String md5 = checkSumMD5("C:/ffmpeg.exe");
+        info("md5 = [" + md5 + "]");
+
+        String sha1 = checkSumSHA1("C:/ffmpeg.exe");
+        info("sha1 = [" + sha1 + "]");
+
         info("Done.");
     }
 }
