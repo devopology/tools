@@ -12,10 +12,10 @@ public class Test extends Toolset {
         info("Let's go ...");
         setConfiguration(CONFIGURATION_LOGGER_MUTE, "true");
         info("pwd = [" + pwd() + "]");
-        cd("C:/development");
+        changeDirectory("C:/development");
         File file = absoluteFile();
         info("file = [" + file.getCanonicalPath() + "]");
-        cd("git");
+        changeDirectory("git");
         info("pwd = [" + pwd() + "]");
         file = absoluteFile();
         info("file = [" + file.getCanonicalPath() + "]");
