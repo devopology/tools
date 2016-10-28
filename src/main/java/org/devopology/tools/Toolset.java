@@ -44,7 +44,7 @@ public class Toolset {
     private final static SimpleLogger logger = new SimpleLogger(CLASS_NAME);
     private final static JSONParser jsonParser = new JSONParser();
 
-    public final static String CONFIGURATION_LOGGER_MUTE = CLASS_NAME + ".mute";
+    public final static String CONFIGURATION_LOGGER_MUTE_METHODS = CLASS_NAME + ".muteMethods";
     public final static String CONFIGURATION_EXECUTE_SHOW_CONTENT = CLASS_NAME + ".execute.showContent";
 
     /**
@@ -170,6 +170,31 @@ public class Toolset {
 
     private File absoluteFile(File file) {
         return absoluteFile(file.getPath());
+    }
+
+    private void methodLog(String methodName, Object ... objects) {
+        boolean muteMethodLog = "true".equals(getConfiguration(CONFIGURATION_LOGGER_MUTE_METHODS, "false"));
+
+        if (muteMethodLog) {
+            return;
+        }
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(methodName);
+        builder.append("( ");
+
+        if (null != objects) {
+            for (int i=0; i<objects.length; i++) {
+                if (i > 0) {
+                    builder.append(", ");
+                }
+
+                builder.append(objects[i].toString());
+            }
+        }
+
+        builder.append(" )");
+        info(builder.toString());
     }
 
     /**
@@ -311,7 +336,7 @@ public class Toolset {
      * @param object
      */
     public void debug(Object object) {
-        if ("false".equals(getConfiguration(CONFIGURATION_LOGGER_MUTE, "false"))) {
+        { //if ("false".equals(getConfiguration(CONFIGURATION_LOGGER_MUTE, "false"))) {
             logger.debug(object.toString());
         }
     }
@@ -322,7 +347,7 @@ public class Toolset {
      * @param object
      */
     public void trace(Object object) {
-        if ("false".equals(getConfiguration(CONFIGURATION_LOGGER_MUTE, "false"))) {
+        { //if ("false".equals(getConfiguration(CONFIGURATION_LOGGER_MUTE, "false"))) {
             logger.trace(object.toString());
         }
     }
@@ -333,7 +358,7 @@ public class Toolset {
      * @param object
      */
     public void info(Object object) {
-        if ("false".equals(getConfiguration(CONFIGURATION_LOGGER_MUTE, "false"))) {
+        { //if ("false".equals(getConfiguration(CONFIGURATION_LOGGER_MUTE, "false"))) {
             logger.info(object.toString());
         }
     }
@@ -364,7 +389,7 @@ public class Toolset {
     public void changeDirectory(String path) {
         try {
             File file = absoluteFile(path);
-            info("changeDirectory( " + file.getCanonicalPath() + " )");
+            methodLog("changeDirectory", file);
 
             if (false == file.exists()) {
                 throw new IOException(path + " doesn't exist");
@@ -468,73 +493,6 @@ public class Toolset {
     }
 
     /**
-     * Method to create a directory, creating any necassary parent directories
-     *
-     * @param path
-     */
-    /*
-    public void mkdirs(String path) {
-        try {
-            File file = absoluteFile(path);
-            info("mkdirs( " + file.getCanonicalPath() + " )");
-            if (!file.exists()) {
-                if (!file.mkdirs()) {
-                    throw new ToolsetException("mkdirs() Exception : can't create info directory");
-                }
-            }
-        }
-        catch (ToolsetException te) {
-            throw te;
-        }
-        catch (Throwable t) {
-            throw new ToolsetException("mkdirs() Exception ", t);
-        }
-    }
-
-    public void rm(String path) {
-        try {
-            File file = absoluteFile(path);
-            info("rm( " + file.getCanonicalPath() + ")");
-
-            if (file.exists()) {
-                if (file.isFile()) {
-                    if (!file.delete()) {
-                        throw new ToolsetException("rm() Exception : can't delete file");
-                    }
-                } else {
-                    throw new ToolsetException("rm() Exception : not a file");
-                }
-            }
-        }
-        catch (ToolsetException te) {
-            throw te;
-        }
-        catch (Throwable t) {
-            throw new ToolsetException("mkdirs() Exception ", t);
-        }
-    }
-
-    /**
-     * Method to remove a directory, recursively deleting any children
-     *
-     * @param path
-     */
-    /*
-    public void rmdir(String path) {
-        try {
-            File file = absoluteFile(path);
-            info("rmdir( " + file.getCanonicalPath() + " )");
-            FileUtils.deleteDirectory(file);
-        }
-        catch (ToolsetException te) {
-            throw te;
-        }
-        catch (Throwable t) {
-            throw new ToolsetException("rmdir() Exception ", t);
-        }
-    }
-
-    /**
      * Method to load Properties from a file
      *
      * @param path
@@ -617,41 +575,6 @@ public class Toolset {
             throw new ToolsetException("typeString() Exception ", t);
         }
     }
-
-    /*
-    public void copy(String sourcePath, String destinationPath) {
-        try {
-            File sourceFile = absoluteFile(sourcePath);
-            File destinationFile = absoluteFile(destinationPath);
-            info("copy( " + sourceFile.getCanonicalPath() + ", " + destinationFile.getCanonicalPath() + " )");
-
-            FileUtils.copyFile(sourceFile, destinationFile);
-        }
-        catch (Throwable t) {
-            throw new ToolsetException("type() Exception ", t);
-        }
-    }
-    */
-
-    /**
-     * Method to rename a file
-     *
-     * @param oldPath
-     * @param newPath
-     */
-    /*
-    public void rename(String oldPath, String newPath) {
-        try {
-            File oldFile = absoluteFile(oldPath);
-            File newFile = absoluteFile(newPath);
-            info("rename( " + oldFile.getCanonicalPath() + ", " + newFile.getCanonicalPath() + " )");
-            oldFile.renameTo(newFile);
-        }
-        catch (Throwable t) {
-            throw new ToolsetException("cd() Exception ", t);
-        }
-    }
-    */
 
     public List<String> listFiles(String path) {
         try {
@@ -751,7 +674,7 @@ public class Toolset {
      *
      * @param properties
      * @param inputFilePath
-     * @param infoFilePath
+     * @param outFilePath
      */
     public void replaceProperties(Properties properties, String inputFilePath, String outFilePath) {
         try {
@@ -1098,6 +1021,15 @@ public class Toolset {
         }
     }
 
+    public void copyFileToDirectory(String srcFile, String destFile, boolean preserveFileDate) {
+        try {
+            FileUtils.copyFileToDirectory(absoluteFile(srcFile), absoluteFile(destFile), preserveFileDate);
+        }
+        catch (Throwable t) {
+            throw new ToolsetException("copyFileToDirectory() Exception ", t);
+        }
+    }
+
     public void copyDirectoryToDirectory(String srcDir, String destDir) {
         try {
             FileUtils.copyDirectoryToDirectory(absoluteFile(srcDir), absoluteFile(destDir));
@@ -1110,6 +1042,15 @@ public class Toolset {
     public void copyDirectory(String srcDir, String destDir) {
         try {
             FileUtils.copyDirectory(absoluteFile(srcDir), absoluteFile(destDir));
+        }
+        catch (Throwable t) {
+            throw new ToolsetException("copyDirectory() Exception ", t);
+        }
+    }
+
+    public void copyDirectory(String srcDir, String destDir, boolean preserveFileDate) {
+        try {
+            FileUtils.copyDirectory(absoluteFile(srcDir), absoluteFile(destDir), preserveFileDate);
         }
         catch (Throwable t) {
             throw new ToolsetException("copyDirectory() Exception ", t);
@@ -1242,6 +1183,8 @@ public class Toolset {
 
     public long checksumCRC32(String file) {
         try {
+            File fileFile = absoluteFile(file);
+            methodLog("checksumCRC32", file);
             return FileUtils.checksumCRC32(absoluteFile(file));
         }
         catch (Throwable t) {
@@ -1251,6 +1194,7 @@ public class Toolset {
 
     public void moveDirectory(String srcDir, String destDir) {
         try {
+            // TODO logMethod
             FileUtils.moveDirectory(absoluteFile(srcDir), absoluteFile(destDir));
         }
         catch (Throwable t) {
@@ -1260,7 +1204,10 @@ public class Toolset {
 
     public void moveDirectoryToDirectory(String src, String destDir, boolean createDestDir)  {
         try {
-            FileUtils.moveDirectoryToDirectory(absoluteFile(src), absoluteFile(destDir), createDestDir);
+            File srcFile = absoluteFile(src);
+            File destDirFile = absoluteFile(destDir);
+            methodLog("moveDirectoryToDirectory", srcFile, destDirFile, createDestDir);
+            FileUtils.moveDirectoryToDirectory(srcFile, destDirFile, createDestDir);
         }
         catch (Throwable t) {
             throw new ToolsetException("moveDirectoryToDirectory() Exception ", t);
@@ -1269,16 +1216,22 @@ public class Toolset {
 
     public void moveFile(String srcFile, String destFile) {
         try {
-            FileUtils.moveFile(absoluteFile(srcFile), absoluteFile(destFile));
+            File srcFileFile = absoluteFile(srcFile);
+            File destFileFile = absoluteFile(destFile);
+            methodLog("moveFile", srcFileFile, destFileFile);
+            FileUtils.moveFile(srcFileFile, destFileFile);
         }
         catch (Throwable t) {
             throw new ToolsetException("moveFile() Exception ", t);
         }
     }
 
-    public void moveFileToDirectory(String srcFile, String destDir, boolean createDestDir)  {
+    public void moveFileToDirectory(String src, String destDir, boolean createDestDir)  {
         try {
-            FileUtils.moveFileToDirectory(absoluteFile(srcFile), absoluteFile(destDir), createDestDir);
+            File srcFile = absoluteFile(src);
+            File destDirFile = absoluteFile(destDir);
+            methodLog("moveFileToDirectory", srcFile, destDirFile, createDestDir);
+            FileUtils.moveFileToDirectory(srcFile, destDirFile, createDestDir);
         }
         catch (Throwable t) {
             throw new ToolsetException("moveFile() Exception ", t);
@@ -1287,7 +1240,10 @@ public class Toolset {
 
     public void moveToDirectory(String src, String destDir, boolean createDestDir) {
         try {
-            FileUtils.moveToDirectory(absoluteFile(src), absoluteFile(destDir), createDestDir);
+            File srcFile = absoluteFile(src);
+            File destDirFile = absoluteFile(destDir);
+            methodLog("moveToDirectory", srcFile, destDirFile, createDestDir);
+            FileUtils.moveToDirectory(srcFile, destDirFile, createDestDir);
         }
         catch (Throwable t) {
             throw new ToolsetException("moveToDirectory() Exception ", t);
