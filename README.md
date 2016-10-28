@@ -38,15 +38,15 @@ One unique feature is that the Toolset class has a concept of a "current directo
         }
     
         public void run(String [] args) throws Exception {
-            println("Let's go ...");
+            log("Let's go ...");
             
             // Java's current directory
-            println("currentDirectory is " + pwd());
+            log("currentDirectory is " + pwd());
             
-            cd("/");
+            changeDirectory("/");
             
             // The root directory
-            println("currentDirectory is " + pwd());
+            log("currentDirectory is " + pwd());
         }
 
 # Building
@@ -91,7 +91,7 @@ For example ...
 
     <snip>
     
-    execute(CP, "*", "/tmp");
+    execute("/bin/cp", "*", "/tmp");
     
     </snip>
 
@@ -101,7 +101,7 @@ Even ...
 
     <snip>
     
-    execute(CP, "/tmp/somefile", ".");
+    execute("/bin/cp", "/tmp/somefile", ".");
     
     </snip>
 
@@ -117,7 +117,7 @@ You can workaround the lack of shell expansion by using the "find" command ...
         List<String> list = stringToList(result.getContent());
         for (String string : list) {
             string = absoluteFile(string).getCanonicalPath();
-            println("absolutePath -> " + string);
+            log("absolutePath -> " + string);
         }
         
         </snip>
@@ -132,7 +132,7 @@ For example ...
     
     // absolutePath with convert the path to absolute
     // based on the Toolset current working directory
-    execute(CP, "/tmp/somefile", absolutePath("."));
+    execute("/bin/cp", "/tmp/somefile", absolutePath("."));
     
     </snip>
 
