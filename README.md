@@ -60,9 +60,13 @@ Using Linux ...
 
 # Using / Examples
 
-The Maven project will produce both a project jar ( org.devopology.tools-1.0.0.jar ) without dependencies and an "UBER" jar ( org.devopology.tools-1.0.0-UBER.jar ) with all dependencies included. In most circumstances you will want to use the UBER jar.
+To use, include the following dependency in your pom.xml file ...
 
-The UBER jar is built by the include Packager class (which is written using the Toolset class), along with the exec-maven-plugin ( http://www.mojohaus.org/exec-maven-plugin/ )
+    <dependency>
+        <groupId>org.devopology</groupId>
+        <artifactId>org.devopology.tools</artifactId>
+        <version>1.0.0</version>
+    </dependency>
 
 Create a new Java class called MyScript in MyScript.java that extends Toolset ...
 
@@ -78,10 +82,6 @@ Create a new Java class called MyScript in MyScript.java that extends Toolset ..
             // Your code here
         }
     }
-
-Compile the class using  javac -cp "*" MyScript.java
-
-Run the MyScript class using  java -cp "*:." MyScript
 
 # Caveats
 
