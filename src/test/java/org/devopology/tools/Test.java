@@ -41,10 +41,10 @@ public class Test extends Toolset {
     public void test() throws Exception {
         info("Let's go ...");
 
-        String rootPath = "/";
+        String rootPath = "/tmp/";
 
         if (SystemUtils.IS_OS_WINDOWS) {
-            rootPath = "C:/";
+            rootPath = "C:/tmp/";
         }
 
         changeDirectory(rootPath);
