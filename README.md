@@ -26,7 +26,7 @@ One unique feature is that the Toolset class has a concept of a "current directo
 
     package org.devopology.tools.test;
     
-    import org.devopology.tools.ExecutionResult;
+    import org.devopology.tools.ExecResult;
     import org.devopology.tools.Toolset;
     
     import java.util.ArrayList;

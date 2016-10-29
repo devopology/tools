@@ -19,7 +19,7 @@ package org.devopology.tools;
 /**
  * Execute result
  */
-public interface ExecutionResult {
+public interface ExecResult {
 
     /**
      * Get the exit code of the execute call
