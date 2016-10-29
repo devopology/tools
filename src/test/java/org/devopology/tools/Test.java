@@ -13,8 +13,17 @@ public class Test extends Toolset {
         info("pwd = [" + pwd() + "]");
 
         changeDirectory("C:/development/git/");
-        getFileUtils().copyDirectory(new File("org"), new File("C:/temp/package/org"));
-        getZipUtils().zip("../../temp/package/", "C:/temp/test.zip");
+        info("pwd = [" + pwd() + "]");
+        getFileUtils().forceMkdir(new File("../../temp/package/org"));
+        changeDirectory("../../temp/package/org");
+        info("pwd = [" + pwd() + "]");
+        //getFileUtils().copyDirectory(new File("C:/development/git/org"), new File("."));
+        //getZipUtils().zip("../package/", "C:/temp/test.zip");
+
+        changeDirectory("C:/");
+        changeDirectory("./development");
+        changeDirectory("git");
+        getZipUtils().zip(".", "C:/temp/git.zip");
 
         info("Done.");
     }
