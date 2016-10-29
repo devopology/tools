@@ -47,10 +47,12 @@ public class Toolset {
      * Track the current working directory
      */
     private CurrentDirectory currentDirectory = null;
-    private FileUtils fileUtils = null;
     private ExecUtils execUtils = null;
+    private FileUtils fileUtils = null;
     private NetworkUtils networkUtils = null;
+    private StringUtils stringUtils = null;
     private ZipUtils zipUtils = null;
+
     private Properties properties = null;
 
     /**
@@ -59,9 +61,10 @@ public class Toolset {
     public Toolset() {
         this.properties = new Properties();
         this.currentDirectory = new CurrentDirectory();
-        this.fileUtils = new FileUtils(this);
         this.execUtils = new ExecUtils(this);
+        this.fileUtils = new FileUtils(this);
         this.networkUtils = new NetworkUtils(this);
+        this.stringUtils = new StringUtils();
         this.zipUtils = new ZipUtils(this);
 
         getProperties().setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
@@ -136,16 +139,20 @@ public class Toolset {
         return currentDirectory;
     }
 
-    public FileUtils getFileUtils() {
-        return fileUtils;
-    }
-
     public ExecUtils getExecUtils() {
         return execUtils;
     }
 
+    public FileUtils getFileUtils() {
+        return fileUtils;
+    }
+
     public NetworkUtils getNetworkUtils() {
         return networkUtils;
+    }
+
+    public StringUtils getStringUtils() {
+        return stringUtils;
     }
 
     public ZipUtils getZipUtils() { return zipUtils; }
