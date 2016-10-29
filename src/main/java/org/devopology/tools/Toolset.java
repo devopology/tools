@@ -44,22 +44,14 @@ public class Toolset {
     private final static JSONParser jsonParser = new JSONParser();
 
     /**
-     * File types
-     */
-    public final static int NOT_FOUND = -1;
-    public final static int DIRECTORY = 0;
-    public final static int FILE = 1;
-
-    /**
      * Track the current working directory
      */
-    protected CurrentDirectory currentDirectory = null;
-    protected FileUtils fileUtils = null;
-    protected ExecUtils execUtils = null;
-    protected NetworkUtils networkUtils = null;
-    protected ZipUtils zipUtils = null;
-
-    protected Properties properties = null;
+    private CurrentDirectory currentDirectory = null;
+    private FileUtils fileUtils = null;
+    private ExecUtils execUtils = null;
+    private NetworkUtils networkUtils = null;
+    private ZipUtils zipUtils = null;
+    private Properties properties = null;
 
     /**
      * Constructor
@@ -324,53 +316,21 @@ public class Toolset {
     }
 
     /**
+     * Method to change the current working directory
+     *
+     * @param file
+     */
+    public void changeDirectory(File file) throws IOException {
+        getCurrentDirectory().changeDirectory(file);
+    }
+
+    /**
      * Method to get the current working directory
      *
      * @return String
      */
-    public String pwd() throws IOException {
-        return getCurrentDirectory().getCurrentDirectory().getAbsolutePath();
-    }
-
-    /**
-     * Method to get the "type" of a file
-     *
-     * @param path
-     * @return int
-     */
-    public int type(String path) throws IOException {
-        File file = currentDirectory.absoluteFile(path);
-        if (!file.exists()) {
-            return NOT_FOUND;
-        }
-        else if (file.isDirectory()) {
-            info("type( " + file.getCanonicalPath() + " ) = DIRECTORY");
-            return DIRECTORY;
-        }
-        else {
-            info("type( " + file.getCanonicalPath() + " ) = FILE");
-            return FILE;
-        }
-    }
-
-    /**
-     * Method to get the "type" of a file as a String
-     *
-     * @param path
-     * @return String
-     */
-    public String typeString(String path) throws IOException {
-        int type = type(path);
-        switch(type) {
-            case NOT_FOUND:
-                return "NOT_FOUND";
-            case DIRECTORY:
-                return "DIRECTORY";
-            case FILE:
-                return "FILE";
-            default:
-                throw new IOException("Unknown file type [" + type + "]");
-        }
+    public File pwd() throws IOException {
+        return getCurrentDirectory().getFile().getCanonicalFile();
     }
 
     /**

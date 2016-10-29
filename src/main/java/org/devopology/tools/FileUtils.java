@@ -34,6 +34,13 @@ import java.util.zip.Checksum;
  */
 public class FileUtils {
 
+    /**
+     * File types
+     */
+    public final static int NOT_FOUND = -1;
+    public final static int DIRECTORY = 0;
+    public final static int FILE = 1;
+
     private CurrentDirectory currentDirectory = null;
 
     FileUtils(Toolset toolset) {
@@ -556,6 +563,59 @@ public class FileUtils {
 
     public boolean isSymlink(File file) throws IOException {
         return org.apache.commons.io.FileUtils.isSymlink(file);
+    }
+
+    //
+
+    /**
+     * Method to get the "type" of a file
+     *
+     * @param file
+     * @return int
+     */
+    public int type(File file) throws IOException {
+        file = currentDirectory.absoluteFile(file);
+        if (!file.exists()) {
+            return NOT_FOUND;
+        }
+        else if (file.isDirectory()) {
+            return DIRECTORY;
+        }
+        else {
+            return FILE;
+        }
+    }
+
+    /**
+     * Method to get the "type" of a file as a String
+     *
+     * @param file
+     * @return String
+     */
+    public String typeString(File file) throws IOException {
+        int type = type(file);
+        switch(type) {
+            case NOT_FOUND:
+                return "NOT_FOUND";
+            case DIRECTORY:
+                return "DIRECTORY";
+            case FILE:
+                return "FILE";
+            default:
+                throw new IOException("Unknown file type [" + type + "]");
+        }
+    }
+
+    public boolean exists(File file) throws IOException {
+        return (NOT_FOUND != type(file));
+    }
+
+    public boolean isDirectory(File file) throws IOException {
+        return (DIRECTORY == type(file));
+    }
+
+    public boolean isFile(File file) throws IOException {
+        return (FILE == type(file));
     }
 
     public String md5Sum(File file) throws IOException {
