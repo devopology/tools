@@ -293,12 +293,13 @@ public class SimpleLogger extends MarkerIgnoringBase {
     /** The short name of this simple log instance */
     private transient String shortLogName = null;
 
-    public SimpleLogger(String name) {
+    public SimpleLogger(String name, Properties properties) {
     // Changed to allow direct creation of the Logger
     //SimpleLogger(String name)
         this.name = name;
 
         String levelString = recursivelyComputeLevelString();
+        levelString = properties.getProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
         if (levelString != null) {
             this.currentLogLevel = stringToLevel(levelString);
         } else {
