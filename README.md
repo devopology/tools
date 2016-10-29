@@ -3,8 +3,12 @@
 master  
 [![Build Status](https://travis-ci.org/devopology/tools.svg?branch=master)](https://travis-ci.org/devopology/tools)
 
-develop  
-[![Build Status](https://travis-ci.org/devopology/tools.svg?branch=develop)](https://travis-ci.org/devopology/tools)
+1.0.1
+[![Build Status](https://travis-ci.org/devopology/tools.svg?branch=1.0.1)](https://travis-ci.org/devopology/tools)
+
+
+2.0.0
+[![Build Status](https://travis-ci.org/devopology/tools.svg?branch=2.0.0)](https://travis-ci.org/devopology/tools)
 
 # Background
 
