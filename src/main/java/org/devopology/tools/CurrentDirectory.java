@@ -55,7 +55,7 @@ public class CurrentDirectory {
      * @return
      * @throws IOException
      */
-    public File getCurrentDirectory() throws IOException {
+    public File getFile() throws IOException {
         return file.getCanonicalFile();
     }
 
@@ -112,11 +112,22 @@ public class CurrentDirectory {
      * Method to change the current directory
      *
      * @param path
-     * @return File
+     * @return
      * @throws IOException
      */
     public File changeDirectory(String path) throws IOException {
-        File file = new File(path);
+        return changeDirectory(absoluteFile(path));
+    }
+
+    /**
+     * Method to change the current directory
+     *
+     * @param file
+     * @return File
+     * @throws IOException
+     */
+    public File changeDirectory(File file) throws IOException {
+        file = absoluteFile(file);
         if (file.isAbsolute()) {
             file = file.getCanonicalFile();
         }
