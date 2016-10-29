@@ -14,19 +14,36 @@
  *  limitations under the License.
  */
 
-package org.devopology.tools;
+package org.devopology.tools.impl;
 
-public class ToolsetException extends RuntimeException {
+import org.devopology.tools.ExecResult;
 
-    public ToolsetException(String message) {
-        super(message);
+public class ExecResultImpl implements ExecResult {
+
+    private int exitCode = 0;
+    private String content = null;
+
+    public ExecResultImpl() {
+        // DO NOTHING
     }
 
-    public ToolsetException(Throwable t) {
-        super(t);
+    public void setExitCode(int exitCode) {
+        this.exitCode = exitCode;
     }
 
-    public ToolsetException(String message, Throwable t) {
-        super(message, t);
+    public int getExitCode() {
+        return exitCode;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public String toString() {
+        return content;
     }
 }
