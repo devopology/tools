@@ -17,6 +17,8 @@ public class ZipUtils {
     public ZipUtils(Toolset toolset) {
         this.toolset = toolset;
         this.currentDirectory = toolset.getCurrentDirectory();
+
+        org.devopology.tools.impl.ZipUtils.toolset = toolset;
     }
 
     /**
@@ -30,7 +32,7 @@ public class ZipUtils {
         File zipFile = currentDirectory.absoluteFile(zipFilename);
         if (!zipFile.getParentFile().exists()) {
             if (!zipFile.getParentFile().mkdirs()) {
-                throw new IOException("zip() Exception : can't create output directory path");
+                throw new IOException("zip() Exception : Can't create output directory path");
             }
         }
 

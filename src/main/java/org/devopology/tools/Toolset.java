@@ -40,7 +40,7 @@ import java.util.Properties;
 public class Toolset {
 
     private final static String CLASS_NAME = Toolset.class.getName();
-    private final static SimpleLogger logger = new SimpleLogger(CLASS_NAME);
+    private static SimpleLogger logger = null; //new SimpleLogger(CLASS_NAME);
     private final static JSONParser jsonParser = new JSONParser();
 
     /**
@@ -73,6 +73,7 @@ public class Toolset {
         this.zipUtils = new ZipUtils(this);
 
         getProperties().setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
+        //getProperties().setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
         getProperties().setProperty("org.slf4j.simpleLogger.showDateTime", "false");
         getProperties().setProperty("org.slf4j.simpleLogger.showThreadName", "false");
         getProperties().setProperty("org.slf4j.simpleLogger.showLogName", "false");
@@ -81,7 +82,8 @@ public class Toolset {
         getProperties().setProperty("org.slf4j.simpleLogger.log.Sisu", "info");
         getProperties().setProperty("org.slf4j.simpleLogger.warnLevelString", "WARNING");
 
-        logger.init(properties);
+        logger = new SimpleLogger(CLASS_NAME, getProperties());
+        logger.init(getProperties());
     }
 
     private static String listToString(List<String> list) {
