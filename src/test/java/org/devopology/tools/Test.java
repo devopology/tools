@@ -52,7 +52,8 @@ public class Test extends Toolset {
         File file = new File(rootPath + "temp/TEST");
 
         if (getFileUtils().exists(file)) {
-            getFileUtils().forceDelete(file);
+            getFileUtils().cleanDirectory(file);
+            getFileUtils().deleteDirectory(file);
         }
 
         Assert.assertFalse(getFileUtils().exists(file));
