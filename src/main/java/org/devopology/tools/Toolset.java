@@ -24,15 +24,10 @@ import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.io.*;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Class to implement common methods
@@ -40,8 +35,10 @@ import java.util.Properties;
 public class Toolset {
 
     private final static String CLASS_NAME = Toolset.class.getName();
-    private static SimpleLogger logger = null; //new SimpleLogger(CLASS_NAME);
+    private static SimpleLogger logger = null;
     private final static JSONParser jsonParser = new JSONParser();
+    private final static SimpleDateFormat ISO8601DateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+    private final static DecimalFormat secondsFormat = new DecimalFormat("#.000");
 
     /**
      * Track the current working directory
@@ -302,7 +299,7 @@ public class Toolset {
     }
 
     /**
-     * Method to log an error error message
+     * Method to log an error message
      *
      * @param object
      */
@@ -311,6 +308,16 @@ public class Toolset {
             object = "null";
         }
         getLogger().error(object.toString());
+    }
+
+    /**
+     * Method to log an error message
+     *
+     * @param message
+     * @param object
+     */
+    public void error(String message, Object object) {
+        getLogger().error(message, object);
     }
 
     /**
@@ -448,5 +455,14 @@ public class Toolset {
         catch (Throwable t) {
             throw new IOException("loadJSONArray() Exception ", t);
         }
+    }
+
+    /**
+     * Method to get a String representing the current date / time in ISO8601 fornmat
+     *
+     * @return String
+     */
+    public String nowAs8601DateTime() {
+        return ISO8601DateFormat.format(new Date());
     }
 }
