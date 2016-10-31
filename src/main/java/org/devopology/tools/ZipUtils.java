@@ -37,6 +37,21 @@ public class ZipUtils {
         org.devopology.tools.impl.ZipUtils.toolset = toolset;
     }
 
+    private File absoluteFile(File file) throws IOException {
+        return currentDirectory.absoluteFile(file);
+    }
+
+    /**
+     * Method to zip a directory
+     *
+     * @param sourceDirectory
+     * @param zipFile
+     * @throws IOException
+     */
+    public void zip(File sourceDirectory, File zipFile) throws IOException {
+        zip(absoluteFile(sourceDirectory).getAbsolutePath(), absoluteFile(zipFile).getAbsolutePath());
+    }
+
     /**
      * Method to zip a directory
      *
@@ -58,11 +73,34 @@ public class ZipUtils {
     /**
      * Method to unzip a file into a directory
      *
+     * @param zipFile
+     * @param destinationDirectory
+     * @throws IOException
+     */
+    public void unzip(File zipFile, File destinationDirectory) throws IOException {
+        unzip(absoluteFile(zipFile).getAbsolutePath(), absoluteFile(destinationDirectory).getAbsolutePath(), false);
+    }
+
+    /**
+     * Method to unzip a file into a directory
+     *
      * @param zipFilename
      * @param destinationPath
      */
     public void unzip(String zipFilename, String destinationPath) throws IOException {
         unzip(zipFilename, destinationPath, false);
+    }
+
+    /**
+     * Method to unzip  file into a directory
+     *
+     * @param zipFile
+     * @param destinationDirectory
+     * @param overwrite
+     * @throws IOException
+     */
+    public void unzip(File zipFile, File destinationDirectory, boolean overwrite) throws IOException {
+        unzip(absoluteFile(zipFile).getAbsolutePath(), absoluteFile(destinationDirectory).getAbsolutePath(), overwrite);
     }
 
     /**
