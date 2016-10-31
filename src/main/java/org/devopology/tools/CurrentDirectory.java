@@ -30,7 +30,7 @@ public class CurrentDirectory {
      * Constructor using the current working directory
      */
     public CurrentDirectory() {
-        this(new File(".").getAbsoluteFile());
+        this.file = new File(".").getAbsoluteFile();
     }
 
     /**
@@ -40,12 +40,41 @@ public class CurrentDirectory {
      *
      * @param file
      */
-    public CurrentDirectory(File file) {
+    public CurrentDirectory(File file) throws IOException {
         if (file.isAbsolute()) {
             this.file = file;
         }
         else {
             this.file = file.getAbsoluteFile();
+        }
+
+        if (!file.exists() || !file.isDirectory()) {
+            throw new IOException(file.getAbsolutePath() + " doesn't exist or isn't a directory");
+        }
+    }
+
+    /**
+     * Constructor using a directory.  If the File is
+     * relative, it will be relative to the current
+     * working directory
+     *
+     * @param path
+     */
+    public CurrentDirectory(String path) throws IOException {
+        this(new File(path));
+    }
+
+    /**
+     * Method to convert the object to a String, which will be the absolute path
+     *
+     * @return
+     */
+    public String toString() {
+        try {
+            return file.getCanonicalPath();
+        }
+        catch (IOException ioe) {
+            throw new RuntimeException(ioe);
         }
     }
 
