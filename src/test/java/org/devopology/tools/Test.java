@@ -37,7 +37,7 @@ public class Test extends Toolset {
     }
 
     public void test() throws Exception {
-        info("Let's go ...");
+        banner("TESTING");
 
         String rootPath = "/tmp/";
 
@@ -84,6 +84,6 @@ public class Test extends Toolset {
 
         info("I am root = [" + getSystemUtils().isUser("root") + "]");
 
-        info("Done.");
+        banner("TESTING DONE", true);
     }
 }
