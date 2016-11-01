@@ -22,6 +22,8 @@ import java.io.IOException;
 
 public interface SystemUtils {
 
+    public final static String [] DEFAULT_UNIX_SEARCH_PATHS = UnixUtils.DEFAULT_UNIX_SEARCH_PATHS;
+
     String getJavaHome() throws IOException;
 
     String getJavaIoTmpDir() throws IOException;

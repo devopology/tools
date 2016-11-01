@@ -24,6 +24,7 @@ import java.io.IOException;
  */
 public class CurrentDirectory {
 
+    private File resetFile = null;
     private File file = null;
 
     /**
@@ -31,6 +32,7 @@ public class CurrentDirectory {
      */
     public CurrentDirectory() {
         this.file = new File(".").getAbsoluteFile();
+        this.resetFile = file;
     }
 
     /**
@@ -53,14 +55,20 @@ public class CurrentDirectory {
 
         if (file.isAbsolute()) {
             this.file = file;
+            this.resetFile = this.file;
         }
         else {
             this.file = file.getAbsoluteFile();
+            this.resetFile = this.file;
         }
     }
 
     private File absoluteFile(String path) throws IOException {
         return absoluteFile(new File(path));
+    }
+
+    private File canonicalFile(String path) throws IOException {
+        return absoluteFile(new File(path)).getCanonicalFile();
     }
 
     private File absoluteFile(File path) throws IOException {
@@ -76,6 +84,17 @@ public class CurrentDirectory {
         return absoluteFile(path).getAbsolutePath();
     }
 
+    private String canonicalPath(File path) throws IOException {
+        return absoluteFile(path).getCanonicalPath();
+    }
+
+    /**
+     * Method to reset the current directory to the original directory when the class was created
+     */
+    public void reset() {
+        this.file = this.resetFile;
+    }
+
     /**
      * Method to the absolute path of the current directory
      *
@@ -83,46 +102,8 @@ public class CurrentDirectory {
      * @throws IOException
      */
     public String getPath() throws IOException {
-        return file.getAbsolutePath();
+        return file.getCanonicalPath();
     }
-
-    /**
-     * Method to get an absolute File based on the current working directory
-     *
-     * @param file
-     * @return File
-     * @throws IOException
-     */
-//    public File absoluteFile(File file) throws IOException {
-//        if (file.isAbsolute()) {
-//            return file;
-//        }
-//        else {
-//            return new File(this.file.getCanonicalPath() + File.separator + file.getPath()).getCanonicalFile();
-//        }
-//    }
-
-    /**
-     * Method to get an absolute File based on the current working directory
-     *
-     * @param path
-     * @return
-     * @throws IOException
-     */
-//    public File absoluteFile(String path) throws IOException {
-//        return absoluteFile(new File(path));
-//    }
-
-    /**
-     * Method to get an absolute path based on the current working directory
-     *
-     * @param file
-     * @return String
-     * @throws IOException
-     */
-//    public String absolutePath(File file) throws IOException {
-//        return absoluteFile(file).getAbsolutePath();
-//    }
 
     /**
      * Method to get an absolute path based on the current working directory
@@ -151,36 +132,7 @@ public class CurrentDirectory {
      * @throws IOException
      */
     public String changeDirectory(String path) throws IOException {
-        this.file = absoluteFile(path);
-        return this.file.getAbsolutePath();
+        file = canonicalFile(path);
+        return file.getCanonicalPath();
     }
-
-    /**
-     * Method to change the current directory
-     *
-     * @param file
-     * @return File
-     * @throws IOException
-     */
-//    public File changeDirectory(File file) throws IOException {
-//        file = absoluteFile(file);
-//        if (file.isAbsolute()) {
-//            file = file.getCanonicalFile();
-//        }
-//        else {
-//            file = new File(this.file.getCanonicalFile() + File.separator + file.getPath());
-//        }
-//
-//        if (file.exists() == false) {
-//            throw new IOException("changeDirectory() Exception : " + this.file.getCanonicalPath() + " doesn't exist");
-//        }
-//
-//        if (file.isDirectory() == false) {
-//            throw new IOException("changeDirectory() Exception : " + this.file.getCanonicalPath() + " is not a directory");
-//        }
-//
-//        this.file = file;
-//
-//        return this.file.getCanonicalFile();
-//    }
 }

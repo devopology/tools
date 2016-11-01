@@ -17,7 +17,6 @@
 package org.devopology.tools.impl;
 
 import org.apache.commons.lang3.JavaVersion;
-import org.devopology.tools.ExecResult;
 import org.devopology.tools.SystemUtils;
 import org.devopology.tools.Toolset;
 
@@ -88,14 +87,7 @@ public class SystemUtilsImpl implements SystemUtils {
 
     @Override
     public String whoami() throws IOException {
-        String whoamiPath = resolve("whoami", "/bin", "/sbin", "/usr/bin", "/usr/sbin", "/usr/local/bin", "/usr/local/sbin");
-
-        if (null == whoamiPath) {
-            throw new IOException("whoami() Exception : can't find whoami");
-        }
-
-        ExecResult execResult = toolset.getExecUtils().execute(whoamiPath, null, 0);
-        return execResult.getContent().trim();
+        return toolset.getUnixUtils().whoami();
     }
 
     @Override

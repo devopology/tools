@@ -71,7 +71,8 @@ public class ZipUtilsUtilsImpl implements ZipUtils {
             }
         }
 
-        ZipUtils2.zipFolder(sourceFile.getAbsoluteFile(), zipFile.getAbsoluteFile());
+        ZipUtils2 zipUtils2 = new ZipUtils2(toolset);
+        zipUtils2.zipFolder(sourceFile.getAbsoluteFile(), zipFile.getAbsoluteFile());
     }
 
     /**

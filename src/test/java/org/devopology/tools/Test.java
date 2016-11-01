@@ -78,8 +78,7 @@ public class Test extends Toolset {
         String username = getSystemUtils().whoami();
         info("username = [" + username + "]");
 
-        info("I am doug_hoard = [" + getSystemUtils().isUser("doug_hoard") + "]");
-        info("I am doug = [" + getSystemUtils().isUser("doug") + "]");
+        info("I am root = [" + getSystemUtils().isUser("root") + "]");
 
         info("Done.");
     }

@@ -33,7 +33,9 @@ import java.util.Properties;
  */
 public class Toolset {
 
-    private final static String CLASS_NAME = Toolset.class.getName();
+    private static final String CLASS_NAME = Toolset.class.getName();
+    public static final String BANNER_LINE = "------------------------------------------------------------------------";
+
     private static SimpleLogger logger = null; //new SimpleLogger(CLASS_NAME);
 
     /**
@@ -46,6 +48,7 @@ public class Toolset {
     private StringUtils stringUtils = null;
     private ZipUtilsUtilsImpl zipUtils = null;
     private SystemUtils systemUtils = null;
+    private UnixUtils unixUtils = null;
     private JSONUtils jsonUtils = null;
 
     private Properties properties = null;
@@ -63,6 +66,7 @@ public class Toolset {
         this.networkUtils = new NetworkUtilsImpl(this);
         this.stringUtils = new StringUtilsImpl();
         this.systemUtils = new SystemUtilsImpl(this);
+        this.unixUtils = new UnixUtilsImpl(this);
         this.zipUtils = new ZipUtilsUtilsImpl(this);
 
         getProperties().setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
@@ -91,19 +95,19 @@ public class Toolset {
 
         if (null != stringBuilder) {
             return stringBuilder.toString();
-        }
-        else {
+        } else {
             return null;
         }
     }
 
-    private static String arrayToString(String [] array) {
+    private static String arrayToString(String[] array) {
         StringBuilder stringBuilder = null;
 
         if (null != array) {
-            stringBuilder = new StringBuilder();;
+            stringBuilder = new StringBuilder();
+            ;
 
-            for (int i=0; i<array.length; i++) {
+            for (int i = 0; i < array.length; i++) {
                 if (i > 0) {
                     stringBuilder.append(" ");
                 }
@@ -114,17 +118,16 @@ public class Toolset {
 
         if (null != stringBuilder) {
             return stringBuilder.toString();
-        }
-        else {
+        } else {
             return null;
         }
     }
 
     private String getCallerClassName() {
-        StackTraceElement [] stElements = Thread.currentThread().getStackTrace();
-        for (int i=1; i<stElements.length; i++) {
+        StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
+        for (int i = 1; i < stElements.length; i++) {
             StackTraceElement ste = stElements[i];
-            if (!ste.getClassName().equals(Toolset.class.getName()) && ste.getClassName().indexOf("java.lang.Thread") !=0 ) {
+            if (!ste.getClassName().equals(Toolset.class.getName()) && ste.getClassName().indexOf("java.lang.Thread") != 0) {
                 return ste.getClassName();
             }
         }
@@ -139,14 +142,9 @@ public class Toolset {
     private File absoluteFile(File path) throws IOException {
         if (path.isAbsolute()) {
             return path.getAbsoluteFile();
-        }
-        else {
+        } else {
             return new File(getCurrentDirectory().getPath() + File.separator + path.getPath());
         }
-    }
-
-    private String absolutePath(String path) throws IOException {
-        return absoluteFile(new File(path)).getAbsolutePath();
     }
 
     private String absolutePath(File path) throws IOException {
@@ -194,11 +192,35 @@ public class Toolset {
         return systemUtils;
     }
 
+    public UnixUtils getUnixUtils() {
+        return unixUtils;
+    }
+
     public ZipUtilsUtilsImpl getZipUtils() {
         return zipUtils;
     }
 
+    /**
+     * Method to convert a path into an absolute path based on the current working directory
+     *
+     * @param path
+     * @return String
+     * @throws IOException
+     */
+    public String absolutePath(String path) throws IOException {
+        return absoluteFile(new File(path)).getAbsolutePath();
+    }
 
+    /**
+     * Method to convert a path into a canonical path based on the current working directory
+     *
+     * @param path
+     * @return String
+     * @throws IOException
+     */
+    public String canonicalPath(String path) throws IOException {
+        return absoluteFile(path).getCanonicalPath();
+    }
 
     /**
      * Method to get a property value based on key
@@ -248,7 +270,7 @@ public class Toolset {
      * @param string
      * @return String []
      */
-    public String [] stringToArray(String string) throws IOException {
+    public String[] stringToArray(String string) throws IOException {
         List<String> result = new ArrayList<String>();
 
         if (null != string) {
@@ -260,7 +282,7 @@ public class Toolset {
             }
         }
 
-        return result.toArray(new String [0]);
+        return result.toArray(new String[0]);
     }
 
     /**
@@ -307,7 +329,7 @@ public class Toolset {
         getLogger().trace(object.toString());
     }
 
-    public String [] arguments(String... arguments) {
+    public String[] arguments(String... arguments) {
         return arguments;
     }
 
@@ -347,8 +369,8 @@ public class Toolset {
      *
      * @param path
      */
-    public void changeDirectory(String path) throws IOException {
-        getCurrentDirectory().changeDirectory(path);
+    public String changeDirectory(String path) throws IOException {
+        return getCurrentDirectory().changeDirectory(path);
     }
 
     /**
@@ -358,5 +380,16 @@ public class Toolset {
      */
     public String pwd() throws IOException {
         return getCurrentDirectory().getPath();
+    }
+
+    /**
+     * Method to log a banner
+     *
+     * @param message
+     */
+    public void banner(String message) {
+        info(BANNER_LINE);
+        info(message);
+        info(BANNER_LINE);
     }
 }
