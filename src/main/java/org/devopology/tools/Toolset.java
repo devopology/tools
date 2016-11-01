@@ -410,6 +410,12 @@ public class Toolset {
         banner(message, false);
     }
 
+    /**
+     * Method to log a banner with extended data
+     *
+     * @param message
+     * @param extended
+     */
     public void banner(String message, boolean extended) {
         if (null == endTimestamp) {
             markEndTimestamp();
