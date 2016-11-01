@@ -33,5 +33,22 @@ public interface ExecResult {
      *
      * @return String
      */
+    @Deprecated
     public String getContent();
+
+    /**
+     * Get the output from the execute call
+     * By default trimming leading and trail spaces
+     *
+     * @return String
+     */
+    public String getOutput();
+
+    /**
+     * Get the output from the execute call
+     *
+     * @param trim
+     * @return String
+     */
+    public String getOutput(boolean trim);
 }

@@ -78,6 +78,10 @@ public class Test extends Toolset {
         String username = getSystemUtils().whoami();
         info("username = [" + username + "]");
 
+        String ls = getSystemUtils().resolve("ls", org.devopology.tools.SystemUtils.DEFAULT_UNIX_SEARCH_PATHS);
+        String output = getExecUtils().execute(ls, null, 0).getOutput();
+        System.out.println("ls = [" + output + "]");
+
         info("I am root = [" + getSystemUtils().isUser("root") + "]");
 
         info("Done.");

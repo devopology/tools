@@ -21,7 +21,7 @@ import org.devopology.tools.ExecResult;
 public class ExecResultImpl implements ExecResult {
 
     private int exitCode = 0;
-    private String content = null;
+    private String output = null;
 
     public ExecResultImpl() {
         // DO NOTHING
@@ -36,17 +36,36 @@ public class ExecResultImpl implements ExecResult {
         return exitCode;
     }
 
+    @Deprecated
     public void setContent(String content) {
-        this.content = content;
+        setOutput(content);
+    }
+
+    public void setOutput(String output) {
+        this.output = output;
     }
 
     @Override
+    @Deprecated
     public String getContent() {
-        return content;
+        return getOutput();
+    }
+
+    @Override
+    public String getOutput() {
+        return getOutput(true);
+    }
+
+    public String getOutput(boolean trim) {
+        String output = this.output;
+        if ((null != output) && (true == trim)) {
+            output = output.trim();
+        }
+        return output;
     }
 
     @Override
     public String toString() {
-        return content;
+        return getOutput();
     }
 }
