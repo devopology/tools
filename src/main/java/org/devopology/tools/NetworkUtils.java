@@ -17,35 +17,8 @@
 package org.devopology.tools;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 
-/**
- * Class to implement NetworkUtils
- */
-public class NetworkUtils {
+public interface NetworkUtils {
 
-    private Toolset toolset = null;
-
-    NetworkUtils(Toolset toolset) {
-        this.toolset = toolset;
-    }
-
-    /**
-     * Method to determine if a TCP/IP connection to a socket can connect
-     *
-     * @param hostname
-     * @param port
-     * @return boolean
-     * @throws IOException
-     */
-    public boolean canConnect(String hostname, int port) throws IOException {
-        try {
-            Socket socket = new Socket();
-            socket.connect(new InetSocketAddress(hostname, port), 1000);
-            return true;
-        } catch (IOException ioe) {
-            return false;
-        }
-    }
+    boolean canConnect(String hostname, int port) throws IOException;
 }

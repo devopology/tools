@@ -16,32 +16,39 @@
 
 package org.devopology.tools;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.io.IOException;
 
-public interface ZipUtils {
+/**
+ * Created by Doug on 10/31/2016.
+ */
+public interface JSONUtils {
+
+    public JSONObject parseJSONObject(String json) throws IOException;
 
     /**
-     * Method to zip a directory
+     * Method to load a file's content as a JSONObject
      *
-     * @param sourcePath
-     * @param zipFilename
+     * @param path
+     * @return JSONObject
      */
-    public void zip(String sourcePath, String zipFilename) throws IOException;
+    public JSONObject loadJSONObject(String path) throws IOException;
 
     /**
-     * Method to unzip a file into a directory
+     * Method to parse a String as a JSONArray
      *
-     * @param zipFilename
-     * @param destinationPath
+     * @param json
+     * @return JSONArray
      */
-    public void unzip(String zipFilename, String destinationPath) throws IOException;
+    public JSONArray parseJSONArray(String json) throws IOException;
 
     /**
-     * Method to unzip a file into a directory
+     * Method to load a file's content as a JSONArray
      *
-     * @param zipFilename
-     * @param destinationPath
-     * @param overwrite
+     * @param path
+     * @return JSONArray
      */
-    public void unzip(String zipFilename, String destinationPath, boolean overwrite) throws IOException;
+    public JSONArray loadJSONArray(String path) throws IOException;
 }

@@ -18,41 +18,25 @@ package org.devopology.tools;
 
 import org.apache.commons.lang3.JavaVersion;
 
-import java.io.File;
 import java.io.IOException;
 
-/**
- * Class to implement SystemUtils
- */
-public class SystemUtils {
+public interface SystemUtils {
 
-    private Toolset toolset = null;
+    String getJavaHome() throws IOException;
 
-    SystemUtils(Toolset toolset) {
-        this.toolset = toolset;
-    }
+    String getJavaIoTmpDir() throws IOException;
 
-    public File getJavaHome() throws IOException {
-        return toolset.getCurrentDirectory().absoluteFile(org.apache.commons.lang3.SystemUtils.getJavaHome());
-    }
+    String getUserDir() throws IOException;
 
-    public File getJavaIoTmpDir() throws IOException {
-        return toolset.getCurrentDirectory().absoluteFile(org.apache.commons.lang3.SystemUtils.getJavaIoTmpDir());
-    }
+    String getUserHome() throws IOException;
 
-    public File getUserDir() throws IOException {
-        return toolset.getCurrentDirectory().absoluteFile(org.apache.commons.lang3.SystemUtils.getUserDir());
-    }
+    boolean isJavaAwtHeadless();
 
-    public  File getUserHome() throws IOException {
-        return toolset.getCurrentDirectory().absoluteFile(org.apache.commons.lang3.SystemUtils.getUserHome());
-    }
+    boolean isJavaVersionAtLeast(JavaVersion requiredVersion);
 
-    public boolean isJavaAwtHeadless() {
-        return org.apache.commons.lang3.SystemUtils.isJavaAwtHeadless();
-    }
+    String whoami() throws IOException;
 
-    public boolean isJavaVersionAtLeast(JavaVersion requiredVersion) {
-        return org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast(requiredVersion);
-    }
+    boolean isUser(String username) throws IOException;
+
+    String resolve(String executable, String ... paths) throws IOException;
 }

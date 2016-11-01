@@ -17,21 +17,15 @@
 package org.devopology.tools;
 
 import org.apache.commons.io.FilenameUtils;
-import org.devopology.tools.impl.SimpleLogger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ContainerFactory;
-import org.json.simple.parser.JSONParser;
+import org.devopology.tools.impl.*;
 import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -41,17 +35,18 @@ public class Toolset {
 
     private final static String CLASS_NAME = Toolset.class.getName();
     private static SimpleLogger logger = null; //new SimpleLogger(CLASS_NAME);
-    private final static JSONParser jsonParser = new JSONParser();
 
     /**
      * Track the current working directory
      */
     private CurrentDirectory currentDirectory = null;
-    private ExecUtils execUtils = null;
+    private ExecUtilsImpl execUtils = null;
     private FileUtils fileUtils = null;
     private NetworkUtils networkUtils = null;
     private StringUtils stringUtils = null;
-    private ZipUtils zipUtils = null;
+    private ZipUtilsUtilsImpl zipUtils = null;
+    private SystemUtils systemUtils = null;
+    private JSONUtils jsonUtils = null;
 
     private Properties properties = null;
 
@@ -60,15 +55,17 @@ public class Toolset {
      */
     public Toolset() {
         this.properties = new Properties();
+
         this.currentDirectory = new CurrentDirectory();
-        this.execUtils = new ExecUtils(this);
-        this.fileUtils = new FileUtils(this);
-        this.networkUtils = new NetworkUtils(this);
-        this.stringUtils = new StringUtils();
-        this.zipUtils = new ZipUtils(this);
+        this.execUtils = new ExecUtilsImpl(this);
+        this.fileUtils = new FileUtilsImpl(this);
+        this.jsonUtils = new JSONUtilsImpl(this);
+        this.networkUtils = new NetworkUtilsImpl(this);
+        this.stringUtils = new StringUtilsImpl();
+        this.systemUtils = new SystemUtilsImpl(this);
+        this.zipUtils = new ZipUtilsUtilsImpl(this);
 
         getProperties().setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
-        //getProperties().setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
         getProperties().setProperty("org.slf4j.simpleLogger.showDateTime", "false");
         getProperties().setProperty("org.slf4j.simpleLogger.showThreadName", "false");
         getProperties().setProperty("org.slf4j.simpleLogger.showLogName", "false");
@@ -135,16 +132,54 @@ public class Toolset {
         return getClass().getName();
     }
 
+    private File absoluteFile(String path) throws IOException {
+        return absoluteFile(new File(path));
+    }
+
+    private File absoluteFile(File path) throws IOException {
+        if (path.isAbsolute()) {
+            return path.getAbsoluteFile();
+        }
+        else {
+            return new File(getCurrentDirectory().getPath() + File.separator + path.getPath());
+        }
+    }
+
+    private String absolutePath(String path) throws IOException {
+        return absoluteFile(new File(path)).getAbsolutePath();
+    }
+
+    private String absolutePath(File path) throws IOException {
+        return absoluteFile(path).getAbsolutePath();
+    }
+
+    public Properties getProperties() {
+        return properties;
+    }
+
+    /**
+     * Method to get the slf4j Logger
+     *
+     * @return Logger
+     */
+    public Logger getLogger() {
+        return logger;
+    }
+
     public CurrentDirectory getCurrentDirectory() {
         return currentDirectory;
     }
 
-    public ExecUtils getExecUtils() {
+    public ExecUtilsImpl getExecUtils() {
         return execUtils;
     }
 
     public FileUtils getFileUtils() {
         return fileUtils;
+    }
+
+    public JSONUtils getJsonUtils() {
+        return jsonUtils;
     }
 
     public NetworkUtils getNetworkUtils() {
@@ -155,11 +190,15 @@ public class Toolset {
         return stringUtils;
     }
 
-    public ZipUtils getZipUtils() { return zipUtils; }
-
-    public Properties getProperties() {
-        return properties;
+    public SystemUtils getSystemUtils() {
+        return systemUtils;
     }
+
+    public ZipUtilsUtilsImpl getZipUtils() {
+        return zipUtils;
+    }
+
+
 
     /**
      * Method to get a property value based on key
@@ -241,16 +280,7 @@ public class Toolset {
      * @return String
      */
     public String noPath(String path) throws IOException {
-        return currentDirectory.absoluteFile(path).getName();
-    }
-
-    /**
-     * Method to get the slf4j Logger
-     *
-     * @return Logger
-     */
-    public Logger getLogger() {
-        return logger;
+        return absoluteFile(path).getName();
     }
 
     /**
@@ -277,40 +307,39 @@ public class Toolset {
         getLogger().trace(object.toString());
     }
 
+    public String [] arguments(String... arguments) {
+        return arguments;
+    }
+
     /**
      * Method to log an info message
      *
-     * @param object
+     * @param message
      */
-    public void info(Object object) {
-        if (null == object) {
-            object = "null";
-        }
-        getLogger().info(object.toString());
+    public void info(String message) {
+        getLogger().info(message);
     }
 
     /**
      * Method to log a warning warning
      *
-     * @param object
+     * @param message
      */
-    public void warn(Object object) {
-        if (null == object) {
-            object = "null";
-        }
-        getLogger().warn(object.toString());
+    public void warn(String message) {
+        getLogger().warn(message);
     }
 
     /**
-     * Method to log an error error message
+     * Method to log an error message
      *
-     * @param object
+     * @param message
      */
-    public void error(Object object) {
-        if (null == object) {
-            object = "null";
-        }
-        getLogger().error(object.toString());
+    public void error(String message) {
+        getLogger().error(message);
+    }
+
+    public void error(String message, Object object) {
+        getLogger().error(message, object);
     }
 
     /**
@@ -323,130 +352,11 @@ public class Toolset {
     }
 
     /**
-     * Method to change the current working directory
-     *
-     * @param file
-     */
-    public void changeDirectory(File file) throws IOException {
-        getCurrentDirectory().changeDirectory(file);
-    }
-
-    /**
      * Method to get the current working directory
      *
      * @return String
      */
-    public File pwd() throws IOException {
-        return getCurrentDirectory().getFile().getCanonicalFile();
-    }
-
-    /**
-     * Method to parse a String as a JSONObject
-     *
-     * @param json
-     * @return JSONOBject
-     */
-    public JSONObject parseJSONObject(String json) throws IOException {
-        try {
-            return (JSONObject) jsonParser.parse(
-                    json,
-                    new ContainerFactory() {
-                        @Override
-                        public Map createObjectContainer() {
-                            return null;
-                        }
-
-                        @Override
-                        public List creatArrayContainer() {
-                            return null;
-                        }
-                    });
-        }
-        catch (Throwable t) {
-            throw new IOException("parseJSONObject() Exception ", t);
-        }
-    }
-
-    /**
-     * Method to load a file's content as a JSONObject
-     *
-     * @param path
-     * @return JSONObject
-     */
-    public JSONObject loadJSONObject(String path) throws IOException {
-            File file = currentDirectory.absoluteFile(path);
-            try {
-                return (JSONObject) jsonParser.parse(
-                        new FileReader(file),
-                        new ContainerFactory() {
-                            @Override
-                            public Map createObjectContainer() {
-                                return null;
-                            }
-
-                            @Override
-                            public List creatArrayContainer() {
-                                return null;
-                            }
-                        });
-            }
-            catch (Throwable t) {
-                throw new IOException("loadJSONObject() Exception ", t);
-            }
-    }
-
-    /**
-     * Method to parse a String as a JSONArray
-     *
-     * @param json
-     * @return JSONArray
-     */
-    public JSONArray parseJSONArray(String json) throws IOException {
-        try {
-            return (JSONArray) jsonParser.parse(
-                    json,
-                    new ContainerFactory() {
-                        @Override
-                        public Map createObjectContainer() {
-                            return null;
-                        }
-
-                        @Override
-                        public List creatArrayContainer() {
-                            return null;
-                        }
-                    });
-        }
-        catch (Throwable t) {
-            throw new IOException("parseJSONArray() Exception ", t);
-        }
-    }
-
-    /**
-     * Method to load a file's content as a JSONArray
-     *
-     * @param path
-     * @return JSONArray
-     */
-    public JSONArray loadJSONArray(String path) throws IOException {
-        try {
-            File file = currentDirectory.absoluteFile(path);
-            return (JSONArray) jsonParser.parse(
-                    new FileReader(file),
-                    new ContainerFactory() {
-                        @Override
-                        public Map createObjectContainer() {
-                            return null;
-                        }
-
-                        @Override
-                        public List creatArrayContainer() {
-                            return null;
-                        }
-                    });
-        }
-        catch (Throwable t) {
-            throw new IOException("loadJSONArray() Exception ", t);
-        }
+    public String pwd() throws IOException {
+        return getCurrentDirectory().getPath();
     }
 }

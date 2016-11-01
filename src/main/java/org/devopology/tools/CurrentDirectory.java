@@ -30,7 +30,7 @@ public class CurrentDirectory {
      * Constructor using the current working directory
      */
     public CurrentDirectory() {
-        this(new File(".").getAbsoluteFile());
+        this.file = new File(".").getAbsoluteFile();
     }
 
     /**
@@ -38,9 +38,19 @@ public class CurrentDirectory {
      * relative, it will be relative to the current
      * working directory
      *
-     * @param file
+     * @param path
      */
-    public CurrentDirectory(File file) {
+    public CurrentDirectory(String path) throws IOException {
+        File file = new File(path);
+
+        if (!file.exists()) {
+            throw new IOException(path + " doesn't exist");
+        }
+
+        if (!file.isDirectory()) {
+            throw new IOException(path + " isn't a directory");
+        }
+
         if (file.isAbsolute()) {
             this.file = file;
         }
@@ -49,14 +59,31 @@ public class CurrentDirectory {
         }
     }
 
+    private File absoluteFile(String path) throws IOException {
+        return absoluteFile(new File(path));
+    }
+
+    private File absoluteFile(File path) throws IOException {
+        if (path.isAbsolute()) {
+            return path.getAbsoluteFile();
+        }
+        else {
+            return new File(getPath() + File.separator + path.getPath());
+        }
+    }
+
+    private String absolutePath(File path) throws IOException {
+        return absoluteFile(path).getAbsolutePath();
+    }
+
     /**
-     * Method to get the current directory
+     * Method to the absolute path of the current directory
      *
-     * @return
+     * @return String
      * @throws IOException
      */
-    public File getFile() throws IOException {
-        return file.getCanonicalFile();
+    public String getPath() throws IOException {
+        return file.getAbsolutePath();
     }
 
     /**
@@ -66,14 +93,14 @@ public class CurrentDirectory {
      * @return File
      * @throws IOException
      */
-    public File absoluteFile(File file) throws IOException {
-        if (file.isAbsolute()) {
-            return file;
-        }
-        else {
-            return new File(this.file.getCanonicalPath() + File.separator + file.getPath()).getCanonicalFile();
-        }
-    }
+//    public File absoluteFile(File file) throws IOException {
+//        if (file.isAbsolute()) {
+//            return file;
+//        }
+//        else {
+//            return new File(this.file.getCanonicalPath() + File.separator + file.getPath()).getCanonicalFile();
+//        }
+//    }
 
     /**
      * Method to get an absolute File based on the current working directory
@@ -82,9 +109,9 @@ public class CurrentDirectory {
      * @return
      * @throws IOException
      */
-    public File absoluteFile(String path) throws IOException {
-        return absoluteFile(new File(path));
-    }
+//    public File absoluteFile(String path) throws IOException {
+//        return absoluteFile(new File(path));
+//    }
 
     /**
      * Method to get an absolute path based on the current working directory
@@ -93,9 +120,9 @@ public class CurrentDirectory {
      * @return String
      * @throws IOException
      */
-    public String absolutePath(File file) throws IOException {
-        return absoluteFile(file).getAbsolutePath();
-    }
+//    public String absolutePath(File file) throws IOException {
+//        return absoluteFile(file).getAbsolutePath();
+//    }
 
     /**
      * Method to get an absolute path based on the current working directory
@@ -105,18 +132,27 @@ public class CurrentDirectory {
      * @throws IOException
      */
     public String absolutePath(String path) throws IOException {
-        return absoluteFile(path).getCanonicalPath();
+        File file = new File(path);
+
+        if (file.isAbsolute()) {
+            return file.getAbsolutePath();
+        }
+        else {
+            return new File(this.file.getAbsoluteFile() + File.separator + file.getPath()).getAbsolutePath();
+        }
+
     }
 
     /**
      * Method to change the current directory
      *
      * @param path
-     * @return
+     * @return String
      * @throws IOException
      */
-    public File changeDirectory(String path) throws IOException {
-        return changeDirectory(absoluteFile(path));
+    public String changeDirectory(String path) throws IOException {
+        this.file = absoluteFile(path);
+        return this.file.getAbsolutePath();
     }
 
     /**
@@ -126,25 +162,25 @@ public class CurrentDirectory {
      * @return File
      * @throws IOException
      */
-    public File changeDirectory(File file) throws IOException {
-        file = absoluteFile(file);
-        if (file.isAbsolute()) {
-            file = file.getCanonicalFile();
-        }
-        else {
-            file = new File(this.file.getCanonicalFile() + File.separator + file.getPath());
-        }
-
-        if (file.exists() == false) {
-            throw new IOException("changeDirectory() Exception : " + this.file.getCanonicalPath() + " doesn't exist");
-        }
-
-        if (file.isDirectory() == false) {
-            throw new IOException("changeDirectory() Exception : " + this.file.getCanonicalPath() + " is not a directory");
-        }
-
-        this.file = file;
-
-        return this.file.getCanonicalFile();
-    }
+//    public File changeDirectory(File file) throws IOException {
+//        file = absoluteFile(file);
+//        if (file.isAbsolute()) {
+//            file = file.getCanonicalFile();
+//        }
+//        else {
+//            file = new File(this.file.getCanonicalFile() + File.separator + file.getPath());
+//        }
+//
+//        if (file.exists() == false) {
+//            throw new IOException("changeDirectory() Exception : " + this.file.getCanonicalPath() + " doesn't exist");
+//        }
+//
+//        if (file.isDirectory() == false) {
+//            throw new IOException("changeDirectory() Exception : " + this.file.getCanonicalPath() + " is not a directory");
+//        }
+//
+//        this.file = file;
+//
+//        return this.file.getCanonicalFile();
+//    }
 }

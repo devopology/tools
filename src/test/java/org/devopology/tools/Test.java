@@ -19,8 +19,6 @@ package org.devopology.tools;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
 
-import java.io.File;
-
 public class Test extends Toolset {
 
     public static void main(String [] args) throws Exception {
@@ -49,22 +47,22 @@ public class Test extends Toolset {
 
         changeDirectory(rootPath);
 
-        File file = new File(rootPath + "temp/TEST");
+        String path = rootPath + "temp/TEST";
 
-        if (getFileUtils().exists(file)) {
-            getFileUtils().cleanDirectory(file);
-            getFileUtils().deleteDirectory(file);
+        if (getFileUtils().exists(path)) {
+            getFileUtils().cleanDirectory(path);
+            getFileUtils().deleteDirectory(path);
         }
 
-        Assert.assertFalse(getFileUtils().exists(file));
+        Assert.assertFalse(getFileUtils().exists(path));
 
-        getFileUtils().forceMkdir(file);
-        Assert.assertTrue(getFileUtils().exists(file));
+        getFileUtils().forceMkdir(path);
+        Assert.assertTrue(getFileUtils().exists(path));
 
-        changeDirectory(file);
-        Assert.assertEquals(rootPath + "temp/TEST", toPlatform(pwd().getAbsolutePath()));
+        changeDirectory(path);
+        Assert.assertEquals(rootPath + "temp/TEST", toPlatform(pwd()));
 
-        File testFile = new File("test.txt");
+        String testFile = "test.txt";
         String string = "This is a test string";
         getFileUtils().write(testFile, string);
 
@@ -74,8 +72,14 @@ public class Test extends Toolset {
         String md5 = getFileUtils().md5Sum(testFile);
         Assert.assertEquals(expectedMD5, md5);
 
-        changeDirectory(new File(".."));
-        Assert.assertTrue(getFileUtils().exists(new File("TEST/test.txt")));
+        changeDirectory("..");
+        Assert.assertTrue(getFileUtils().exists("TEST/test.txt"));
+
+        String username = getSystemUtils().whoami();
+        info("username = [" + username + "]");
+
+        info("I am doug_hoard = [" + getSystemUtils().isUser("doug_hoard") + "]");
+        info("I am doug = [" + getSystemUtils().isUser("doug") + "]");
 
         info("Done.");
     }

@@ -31,6 +31,7 @@ public class ExecResultImpl implements ExecResult {
         this.exitCode = exitCode;
     }
 
+    @Override
     public int getExitCode() {
         return exitCode;
     }
@@ -39,10 +40,12 @@ public class ExecResultImpl implements ExecResult {
         this.content = content;
     }
 
+    @Override
     public String getContent() {
         return content;
     }
 
+    @Override
     public String toString() {
         return content;
     }

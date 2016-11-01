@@ -15,7 +15,7 @@ import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public final class ZipUtils {
+public final class ZipUtils2 {
 
     public static Toolset toolset = null;
 
