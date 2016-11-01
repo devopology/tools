@@ -24,7 +24,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -34,9 +37,17 @@ import java.util.Properties;
 public class Toolset {
 
     private static final String CLASS_NAME = Toolset.class.getName();
+    private static final SimpleDateFormat ISO8601DateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+    private static final DecimalFormat secondsFormat = new DecimalFormat("#0.000");
+
     public static final String BANNER_LINE = "------------------------------------------------------------------------";
 
     private static SimpleLogger logger = null; //new SimpleLogger(CLASS_NAME);
+
+    private Properties properties = null;
+
+    private Long startTimestamp = null;
+    private Long endTimestamp = null;
 
     /**
      * Track the current working directory
@@ -50,8 +61,6 @@ public class Toolset {
     private SystemUtils systemUtils = null;
     private UnixUtils unixUtils = null;
     private JSONUtils jsonUtils = null;
-
-    private Properties properties = null;
 
     /**
      * Constructor
@@ -80,6 +89,8 @@ public class Toolset {
 
         logger = new SimpleLogger(CLASS_NAME, getProperties());
         logger.init(getProperties());
+
+        markStartTimestamp();
     }
 
     private static String listToString(List<String> list) {
@@ -382,14 +393,48 @@ public class Toolset {
         return getCurrentDirectory().getPath();
     }
 
+    public void markStartTimestamp() {
+        this.startTimestamp = System.currentTimeMillis();
+    }
+
+    public void markEndTimestamp() {
+        this.endTimestamp = System.currentTimeMillis();
+    }
+
     /**
      * Method to log a banner
      *
      * @param message
      */
     public void banner(String message) {
+        banner(message, false);
+    }
+
+    public void banner(String message, boolean extended) {
+        if (null == endTimestamp) {
+            markEndTimestamp();
+        }
+
+        Runtime runtime = Runtime.getRuntime();
+        long totalMemory = runtime.totalMemory();
+        long freeMemory = runtime.freeMemory();
+        long usedMemory = totalMemory - freeMemory;
+
+        String totalMemoryString = getFileUtils().byteCountToDisplaySize(totalMemory);
+        totalMemoryString = totalMemoryString.replaceAll(" ", "");
+
+        String usedMemoryString = getFileUtils().byteCountToDisplaySize(usedMemory);
+        usedMemoryString = usedMemoryString.replaceAll(" ", "");
+
         info(BANNER_LINE);
         info(message);
         info(BANNER_LINE);
+
+        if (true == extended) {
+            info("Total time: " + secondsFormat.format((float) (startTimestamp - endTimestamp) / 1000.0f));
+            info("Finished at: " + ISO8601DateFormat.format(new Date()));
+            info("Final memory: " + usedMemoryString + "/" + totalMemoryString);
+            info(BANNER_LINE);
+        }
     }
 }
