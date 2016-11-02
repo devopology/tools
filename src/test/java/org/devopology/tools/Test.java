@@ -85,7 +85,7 @@ public class Test extends Toolset {
         info("I am root = [" + getSystemUtils().isUser("root") + "]");
 
         String filename = "www.devopology.org_index_html";
-        getNetworkUtils().downloadFileViaHTTP("http://www.devopology.org/", filename);
+        getNetworkUtils().downloadFileViaHTTP("https://raw.githubusercontent.com/devopology/tools/master/README.md", filename);
 
         //String downloadedFileContents = getFileUtils().readFileToString(filename);
         //info(downloadedFileContents);
