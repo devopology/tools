@@ -87,7 +87,7 @@ public class NetworkUtilsImpl implements org.devopology.tools.NetworkUtils {
                 toolset.getFileUtils().deleteQuietly(filename);
             }
 
-            throw new IOException("downloadFileViaHTTP() Exception : error [" + execResult.getExitCode() + "] downloading");
+            throw new IOException("downloadFileViaHTTP() Exception : error [" + execResult.getExitCode() + "] downloading URL [" + url + "]");
         }
     }
 }
