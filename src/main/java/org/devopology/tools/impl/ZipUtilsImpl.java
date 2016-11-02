@@ -25,13 +25,13 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Class to implement ZipUtilsUtilsImpl
+ * Class to implement ZipUtilsImpl
  */
-public class ZipUtilsUtilsImpl implements ZipUtils {
+public class ZipUtilsImpl implements ZipUtils {
 
     protected Toolset toolset = null;
 
-    public ZipUtilsUtilsImpl(Toolset toolset) {
+    public ZipUtilsImpl(Toolset toolset) {
         this.toolset = toolset;
     }
 

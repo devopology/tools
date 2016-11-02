@@ -16,6 +16,8 @@
 
 package org.devopology.tools.impl;
 
+import org.devopology.tools.ExecResult;
+import org.devopology.tools.SystemUtils;
 import org.devopology.tools.Toolset;
 
 import java.io.IOException;
@@ -49,6 +51,43 @@ public class NetworkUtilsImpl implements org.devopology.tools.NetworkUtils {
             return true;
         } catch (IOException ioe) {
             return false;
+        }
+    }
+
+    /**
+     * Method to downloasd a file via HTTP/HTTPS, overwriting any existing file
+     *
+     * @param url
+     * @param filename
+     */
+    public void downloadFileViaHTTP(String url, String filename) throws IOException {
+        downloadFileViaHTTP(url, filename, true);
+    }
+
+    /**
+     * Method to downloasd a file via HTTP/HTTPS
+     *
+     * @param url
+     * @param filename
+     * @param overwrite
+     */
+    public void downloadFileViaHTTP(String url, String filename, boolean overwrite) throws IOException {
+        if ((false == overwrite) && (toolset.getFileUtils().exists(filename))) {
+            throw new IOException("downloadFileViaHTTP() Exception : destination file [" + filename + "] already exists");
+        }
+
+        String curl = toolset.getSystemUtils().resolve("curl", SystemUtils.DEFAULT_UNIX_SEARCH_PATHS);
+        if (null == curl) {
+            throw new IOException("downloadFileViaHTTP() Exception : curl is required for file downloads, but was not found");
+        }
+
+        ExecResult execResult = toolset.getExecUtils().execute(curl, toolset.arguments("-s", "-o", toolset.absolutePath(filename), url));
+        if (0 != execResult.getExitCode()) {
+            if (toolset.getFileUtils().exists(filename)) {
+                toolset.getFileUtils().deleteQuietly(filename);
+            }
+
+            throw new IOException("downloadFileViaHTTP() Exception : error [" + execResult.getExitCode() + "] downloading");
         }
     }
 }

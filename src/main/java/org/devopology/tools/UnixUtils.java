@@ -23,14 +23,6 @@ public interface UnixUtils {
     public final static String [] DEFAULT_UNIX_SEARCH_PATHS = new String [] { "/sbin", "/bin", "/usr/sbin", "/usr/bin", "/usr/local/sbin", "/usr/local/bin" };
 
     /**
-     * Method to get whoami
-     *
-     * @return String
-     * @throws IOException
-     */
-    public String whoami() throws IOException;
-
-    /**
      * Method to get the full Linux version String
      *
      * @return String
@@ -63,4 +55,12 @@ public interface UnixUtils {
      * @throws IOException
      */
     public void systemctl(String command, String service) throws IOException;
+
+    /**
+     * Method to get whoami
+     *
+     * @return String
+     * @throws IOException
+     */
+    public String whoami() throws IOException;
 }

@@ -17,7 +17,6 @@
 package org.devopology.tools.impl;
 
 import org.apache.commons.exec.*;
-import org.devopology.tools.CurrentDirectory;
 import org.devopology.tools.ExecResult;
 import org.devopology.tools.ExecUtils;
 import org.devopology.tools.Toolset;
@@ -32,7 +31,7 @@ import java.util.List;
  */
 public class ExecUtilsImpl implements ExecUtils {
 
-    protected CurrentDirectory currentDirectory = null;
+    protected Toolset toolset = null;
 
     /**
      * Exit code of the last executable execution
@@ -40,7 +39,7 @@ public class ExecUtilsImpl implements ExecUtils {
     protected static int EXIT_CODE = 0;
 
     public ExecUtilsImpl(Toolset toolset) {
-        this.currentDirectory = toolset.getCurrentDirectory();
+        this.toolset = toolset;
     }
 
     /**
@@ -73,28 +72,19 @@ public class ExecUtilsImpl implements ExecUtils {
      */
     @Override
     public ExecResult execute(String executable, String[] arguments) throws IOException {
-        return execute(currentDirectory.absolutePath(executable), arguments, 0);
-    }
-
-    /**
-     * Method to execute an executable
-     *
-     * @param executable
-     * @param arguments
-     * @param expectedExitCode
-     * @return ExecResult
-     */
-    @Override
-    public ExecResult execute(String executable, String[] arguments, int expectedExitCode) throws IOException {
         EXIT_CODE = 0;
 
         try {
-            executable = currentDirectory.absolutePath(executable);
+            executable = toolset.getCurrentDirectory().absolutePath(executable);
 
             File file = new File(executable);
 
             if (!file.exists()) {
                 throw new IOException("execute() Exception : Command " + executable + " not found !");
+            }
+
+            if (!file.isFile()) {
+                throw new IOException("execute() Exception : " + executable + " is not a file");
             }
 
             CommandLine commandLine = new CommandLine(executable);
@@ -103,6 +93,8 @@ public class ExecUtilsImpl implements ExecUtils {
                     commandLine.addArgument(argument);
                 }
             }
+
+            //toolset.info("execute() " + commandLine.toString());
 
             DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 
@@ -119,7 +111,76 @@ public class ExecUtilsImpl implements ExecUtils {
 
             ExecResultImpl result = new ExecResultImpl();
             result.setExitCode(resultHandler.getExitValue());
-            result.setContent(outputStream.toString());
+            result.setOutput(outputStream.toString());
+            EXIT_CODE = resultHandler.getExitValue();
+
+            return result;
+        }
+        catch (IOException ioe) {
+            throw ioe;
+        }
+        catch (Throwable t) {
+            throw new IOException("execute() Exception ", t);
+        }
+    }
+
+    /**
+     * Method to execute an executable with an expected exit code
+     * If the exit code doesn't match the exepectedExitcode then
+     * and IOException is thrown
+     *
+     * @param executable
+     * @param arguments
+     * @param expectedExitCode
+     * @return ExecResult
+     */
+    @Override
+    public ExecResult execute(String executable, String[] arguments, int expectedExitCode) throws IOException {
+        EXIT_CODE = 0;
+
+        try {
+            executable = toolset.getCurrentDirectory().absolutePath(executable);
+
+            File file = new File(executable);
+
+            if (!file.exists()) {
+                throw new IOException("execute() Exception : " + executable + " not found");
+            }
+
+            if (!file.isFile()) {
+                throw new IOException("execute() Exception : " + executable + " is not a file");
+            }
+
+            CommandLine commandLine = new CommandLine(executable);
+            if (null != arguments) {
+                for (String argument : arguments) {
+                    commandLine.addArgument(argument);
+                }
+            }
+
+            //toolset.info("execute() " + commandLine.toString());
+
+            DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+
+            ExecuteWatchdog watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
+            Executor executor = new DefaultExecutor();
+            executor.setWatchdog(watchdog);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+            executor.setStreamHandler(streamHandler);
+
+            executor.execute(commandLine, resultHandler);
+            resultHandler.waitFor();
+
+            ExecResultImpl result = new ExecResultImpl();
+            result.setExitCode(resultHandler.getExitValue());
+            result.setOutput(outputStream.toString());
+            EXIT_CODE = resultHandler.getExitValue();
+
+            if (EXIT_CODE != expectedExitCode) {
+                throw new IOException("execute() Exception : Expected exit code of " + expectedExitCode + ", but execution returned " + EXIT_CODE);
+            }
 
             return result;
         }

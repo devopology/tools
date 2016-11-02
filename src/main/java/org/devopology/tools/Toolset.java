@@ -57,7 +57,7 @@ public class Toolset {
     private FileUtils fileUtils = null;
     private NetworkUtils networkUtils = null;
     private StringUtils stringUtils = null;
-    private ZipUtilsUtilsImpl zipUtils = null;
+    private ZipUtilsImpl zipUtils = null;
     private SystemUtils systemUtils = null;
     private UnixUtils unixUtils = null;
     private JSONUtils jsonUtils = null;
@@ -76,7 +76,7 @@ public class Toolset {
         this.stringUtils = new StringUtilsImpl();
         this.systemUtils = new SystemUtilsImpl(this);
         this.unixUtils = new UnixUtilsImpl(this);
-        this.zipUtils = new ZipUtilsUtilsImpl(this);
+        this.zipUtils = new ZipUtilsImpl(this);
 
         getProperties().setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
         getProperties().setProperty("org.slf4j.simpleLogger.showDateTime", "false");
@@ -175,39 +175,84 @@ public class Toolset {
         return logger;
     }
 
+    /**
+     * Method to get the CurrentDirectory
+     *
+     * @return the CurrentDirectory
+     */
     public CurrentDirectory getCurrentDirectory() {
         return currentDirectory;
     }
 
+    /**
+     * Method to get an ExecUtils implementation
+     *
+     * @return an ExecUtils implementation
+     */
     public ExecUtilsImpl getExecUtils() {
         return execUtils;
     }
 
+    /**
+     * Method to get a FileUtils implementation
+     *
+     * @return a FileUtils implementation
+     */
     public FileUtils getFileUtils() {
         return fileUtils;
     }
 
+    /**
+     * Method to get a JSONUtils implementation
+     *
+     * @return a JSONUtils implementation
+     */
     public JSONUtils getJsonUtils() {
         return jsonUtils;
     }
 
+    /**
+     * Method to get a NetworkUtils implementation
+     *
+     * @return a NetworkUtils implementation
+     */
     public NetworkUtils getNetworkUtils() {
         return networkUtils;
     }
 
+    /**
+     * Method to get a StringUtils implementation
+     *
+     * @return a StringUtils implementation
+     */
     public StringUtils getStringUtils() {
         return stringUtils;
     }
 
+    /**
+     * Method to get a SystemUtils implementation
+     *
+     * @return a SystemUtils implementation
+     */
     public SystemUtils getSystemUtils() {
         return systemUtils;
     }
 
+    /**
+     * Method to get a UnixUtils implementation
+     *
+     * @return a UnixUtils implementation
+     */
     public UnixUtils getUnixUtils() {
         return unixUtils;
     }
 
-    public ZipUtilsUtilsImpl getZipUtils() {
+    /**
+     * Method to get a ZipUtils implementation
+     *
+     * @return a ZipUtils implementation
+     */
+    public ZipUtils getZipUtils() {
         return zipUtils;
     }
 

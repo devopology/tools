@@ -21,4 +21,6 @@ import java.io.IOException;
 public interface NetworkUtils {
 
     boolean canConnect(String hostname, int port) throws IOException;
+
+    void downloadFileViaHTTP(String url, String filename) throws IOException;
 }

@@ -80,9 +80,15 @@ public class Test extends Toolset {
 
         String ls = getSystemUtils().resolve("ls", org.devopology.tools.SystemUtils.DEFAULT_UNIX_SEARCH_PATHS);
         String output = getExecUtils().execute(ls, null, 0).getOutput();
-        System.out.println("ls = [" + output + "]");
+        info("ls = [" + output + "]");
 
         info("I am root = [" + getSystemUtils().isUser("root") + "]");
+
+        String filename = "www.devopology.org_index_html";
+        getNetworkUtils().downloadFileViaHTTP("http://www.devopology.org/", filename);
+
+        //String downloadedFileContents = getFileUtils().readFileToString(filename);
+        //info(downloadedFileContents);
 
         banner("TESTING DONE", true);
     }
