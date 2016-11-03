@@ -112,6 +112,7 @@ public class ExecUtilsImpl implements ExecUtils {
             ExecResultImpl result = new ExecResultImpl();
             result.setExitCode(resultHandler.getExitValue());
             result.setOutput(outputStream.toString());
+
             EXIT_CODE = resultHandler.getExitValue();
 
             return result;
