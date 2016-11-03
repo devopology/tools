@@ -46,7 +46,7 @@ public class UnixUtilsImpl implements UnixUtils {
         }
 
         ExecResult execResult = toolset.getExecUtils().execute(whoami, null, 0);
-        return execResult.getContent().trim();
+        return execResult.getOutput().trim();
     }
 
     /**

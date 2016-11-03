@@ -39,27 +39,6 @@ public class JSONUtilsImpl implements JSONUtils {
         this.toolset = toolset;
     }
 
-    private File absoluteFile(String path) throws IOException {
-        return absoluteFile(new File(path));
-    }
-
-    private File absoluteFile(File path) throws IOException {
-        if (path.isAbsolute()) {
-            return path.getAbsoluteFile();
-        }
-        else {
-            return new File(toolset.getCurrentDirectory().getPath() + File.separator + path.getPath());
-        }
-    }
-
-    private String absolutePath(String path) throws IOException {
-        return absoluteFile(new File(path)).getAbsolutePath();
-    }
-
-    private String absolutePath(File path) throws IOException {
-        return absoluteFile(path).getAbsolutePath();
-    }
-
     /**
      * Method to parse a String as a JSONObject
      *
@@ -96,7 +75,7 @@ public class JSONUtilsImpl implements JSONUtils {
      */
     @Override
     public JSONObject loadJSONObject(String path) throws IOException {
-        File file = absoluteFile(path);
+        File file = toolset.absoluteFile(path);
         try {
             return (JSONObject) jsonParser.parse(
                     new FileReader(file),
@@ -154,7 +133,7 @@ public class JSONUtilsImpl implements JSONUtils {
     @Override
     public JSONArray loadJSONArray(String path) throws IOException {
         try {
-            File file = absoluteFile(path);
+            File file = toolset.absoluteFile(path);
             return (JSONArray) jsonParser.parse(
                     new FileReader(file),
                     new ContainerFactory() {

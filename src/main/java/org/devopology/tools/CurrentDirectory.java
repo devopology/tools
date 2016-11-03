@@ -67,11 +67,11 @@ public class CurrentDirectory {
         return absoluteFile(new File(path));
     }
 
-    private File canonicalFile(String path) throws IOException {
+    public File canonicalFile(String path) throws IOException {
         return absoluteFile(new File(path)).getCanonicalFile();
     }
 
-    private File absoluteFile(File path) throws IOException {
+    public File absoluteFile(File path) throws IOException {
         if (path.isAbsolute()) {
             return path.getAbsoluteFile();
         }
@@ -80,11 +80,11 @@ public class CurrentDirectory {
         }
     }
 
-    private String absolutePath(File path) throws IOException {
+    public String absolutePath(File path) throws IOException {
         return absoluteFile(path).getAbsolutePath();
     }
 
-    private String canonicalPath(File path) throws IOException {
+    public String canonicalPath(File path) throws IOException {
         return absoluteFile(path).getCanonicalPath();
     }
 

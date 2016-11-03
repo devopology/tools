@@ -34,45 +34,24 @@ public class SystemUtilsImpl implements SystemUtils {
         this.toolset = toolset;
     }
 
-    private File absoluteFile(String path) throws IOException {
-        return absoluteFile(new File(path));
-    }
-
-    private File absoluteFile(File path) throws IOException {
-        if (path.isAbsolute()) {
-            return path.getAbsoluteFile();
-        }
-        else {
-            return new File(toolset.getCurrentDirectory().getPath() + File.separator + path.getPath());
-        }
-    }
-
-    private String absolutePath(String path) throws IOException {
-        return absoluteFile(new File(path)).getAbsolutePath();
-    }
-
-    private String absolutePath(File path) throws IOException {
-        return absoluteFile(path).getAbsolutePath();
-    }
-
     @Override
     public String getJavaHome() throws IOException {
-        return absoluteFile(org.apache.commons.lang3.SystemUtils.getJavaHome()).getAbsolutePath();
+        return toolset.absoluteFile(org.apache.commons.lang3.SystemUtils.getJavaHome()).getAbsolutePath();
     }
 
     @Override
     public String getJavaIoTmpDir() throws IOException {
-        return absoluteFile(org.apache.commons.lang3.SystemUtils.getJavaIoTmpDir()).getAbsolutePath();
+        return toolset.absoluteFile(org.apache.commons.lang3.SystemUtils.getJavaIoTmpDir()).getAbsolutePath();
     }
 
     @Override
     public String getUserDir() throws IOException {
-        return absoluteFile(org.apache.commons.lang3.SystemUtils.getUserDir()).getAbsolutePath();
+        return toolset.absoluteFile(org.apache.commons.lang3.SystemUtils.getUserDir()).getAbsolutePath();
     }
 
     @Override
     public String getUserHome() throws IOException {
-        return absoluteFile(org.apache.commons.lang3.SystemUtils.getUserHome()).getAbsolutePath();
+        return toolset.absoluteFile(org.apache.commons.lang3.SystemUtils.getUserHome()).getAbsolutePath();
     }
 
     @Override
@@ -99,7 +78,7 @@ public class SystemUtilsImpl implements SystemUtils {
     public String resolve(String executable, String... paths) throws IOException {
         for (int i=0; i<paths.length; i++)
         {
-            File file = absoluteFile(paths[i] + File.separator + executable);
+            File file = toolset.absoluteFile(paths[i] + File.separator + executable);
 
             if (file.exists() && file.isFile()) {
                 return file.getAbsolutePath();

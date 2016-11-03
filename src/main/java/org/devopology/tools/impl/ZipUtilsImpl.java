@@ -35,27 +35,6 @@ public class ZipUtilsImpl implements ZipUtils {
         this.toolset = toolset;
     }
 
-    private File absoluteFile(String path) throws IOException {
-        return absoluteFile(new File(path));
-    }
-
-    private File absoluteFile(File file) throws IOException {
-        if (file.isAbsolute()) {
-            return file.getAbsoluteFile();
-        }
-        else {
-            return new File(toolset.getCurrentDirectory().getPath() + File.separator + file.getPath());
-        }
-    }
-
-    private String absolutePath(String path) throws IOException {
-        return absoluteFile(new File(path)).getAbsolutePath();
-    }
-
-    private String absolutePath(File file) throws IOException {
-        return absoluteFile(file).getAbsolutePath();
-    }
-
     /**
      * Method to zip a directory
      *
@@ -63,8 +42,8 @@ public class ZipUtilsImpl implements ZipUtils {
      * @param zipFilename
      */
     public void zip(String sourcePath, String zipFilename) throws IOException {
-        File sourceFile = absoluteFile(sourcePath);
-        File zipFile = absoluteFile(zipFilename);
+        File sourceFile = toolset.absoluteFile(sourcePath);
+        File zipFile = toolset.absoluteFile(zipFilename);
         if (!zipFile.getParentFile().exists()) {
             if (!zipFile.getParentFile().mkdirs()) {
                 throw new IOException("zip() Exception : Can't create output directory path");
@@ -93,8 +72,8 @@ public class ZipUtilsImpl implements ZipUtils {
      * @param overwrite
      */
     public void unzip(String zipFilename, String destinationPath, boolean overwrite) throws IOException {
-        zipFilename = absolutePath(zipFilename);
-        File destinationFile = absoluteFile(destinationPath);
+        zipFilename = toolset.absolutePath(zipFilename);
+        File destinationFile = toolset.absoluteFile(destinationPath);
         if (overwrite) {
             if (destinationFile.exists()) {
                 toolset.getFileUtils().deleteDirectory(destinationPath);

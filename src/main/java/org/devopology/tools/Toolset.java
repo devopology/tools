@@ -146,22 +146,6 @@ public class Toolset {
         return getClass().getName();
     }
 
-    private File absoluteFile(String path) throws IOException {
-        return absoluteFile(new File(path));
-    }
-
-    private File absoluteFile(File path) throws IOException {
-        if (path.isAbsolute()) {
-            return path.getAbsoluteFile();
-        } else {
-            return new File(getCurrentDirectory().getPath() + File.separator + path.getPath());
-        }
-    }
-
-    private String absolutePath(File path) throws IOException {
-        return absoluteFile(path).getAbsolutePath();
-    }
-
     public Properties getProperties() {
         return properties;
     }
@@ -264,7 +248,40 @@ public class Toolset {
      * @throws IOException
      */
     public String absolutePath(String path) throws IOException {
-        return absoluteFile(new File(path)).getAbsolutePath();
+        return currentDirectory.absoluteFile(new File(path)).getAbsolutePath();
+    }
+
+    /**
+     * Method convert a File into an absolute path based on the current working directory
+     *
+     * @param file
+     * @return String
+     * @throws IOException
+     */
+    public String absolutePath(File file) throws IOException {
+        return currentDirectory.absoluteFile(file).getAbsolutePath();
+    }
+
+    /**
+     * Method to convert a File into an absolute File based on the current working directory
+     *
+     * @param path
+     * @return File
+     * @throws IOException
+     */
+    public File absoluteFile(String path) throws IOException {
+        return currentDirectory.absoluteFile(new File(path));
+    }
+
+    /**
+     * Method to convert a File into an absolute File based on the current working directory
+     *
+     * @param file
+     * @return File
+     * @throws IOException
+     */
+    public File absoluteFile(File file) throws IOException {
+        return currentDirectory.absoluteFile(file);
     }
 
     /**
@@ -385,8 +402,23 @@ public class Toolset {
         getLogger().trace(object.toString());
     }
 
-    public String[] arguments(String... arguments) {
+    /**
+     * Method to convert a variable argument list into a an array
+     *
+     * @param arguments
+     * @return String []
+     */
+    public String [] arguments(String... arguments) {
         return arguments;
+    }
+
+    /* Method to convert a list of Strings into an array
+     *
+     * @param arguments
+     * @return String []
+     */
+    public String [] arguments(List<String> argumentList) {
+        return argumentList.toArray(new String[argumentList.size()]);
     }
 
     /**
