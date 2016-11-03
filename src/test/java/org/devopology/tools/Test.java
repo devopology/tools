@@ -90,6 +90,9 @@ public class Test extends Toolset {
         //String downloadedFileContents = getFileUtils().readFileToString(filename);
         //info(downloadedFileContents);
 
+        Exception e = new Exception();
+        error("Test exception logging", e);
+
         banner("TESTING DONE", true);
     }
 }

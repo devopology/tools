@@ -17,7 +17,16 @@
 package org.devopology.tools;
 
 import org.apache.commons.io.FilenameUtils;
-import org.devopology.tools.impl.*;
+import org.devopology.tools.impl.DigestUtilsImpl;
+import org.devopology.tools.impl.ExecUtilsImpl;
+import org.devopology.tools.impl.FileUtilsImpl;
+import org.devopology.tools.impl.JSONUtilsImpl;
+import org.devopology.tools.impl.NetworkUtilsImpl;
+import org.devopology.tools.impl.SimpleLogger;
+import org.devopology.tools.impl.StringUtilsImpl;
+import org.devopology.tools.impl.SystemUtilsImpl;
+import org.devopology.tools.impl.UnixUtilsImpl;
+import org.devopology.tools.impl.ZipUtilsImpl;
 import org.slf4j.Logger;
 
 import java.io.BufferedReader;
@@ -53,6 +62,7 @@ public class Toolset {
      * Track the current working directory
      */
     private CurrentDirectory currentDirectory = null;
+    private DigestUtils digestUtils = null;
     private ExecUtilsImpl execUtils = null;
     private FileUtils fileUtils = null;
     private NetworkUtils networkUtils = null;
@@ -69,6 +79,7 @@ public class Toolset {
         this.properties = new Properties();
 
         this.currentDirectory = new CurrentDirectory();
+        this.digestUtils = new DigestUtilsImpl();
         this.execUtils = new ExecUtilsImpl(this);
         this.fileUtils = new FileUtilsImpl(this);
         this.jsonUtils = new JSONUtilsImpl(this);
@@ -169,11 +180,20 @@ public class Toolset {
     }
 
     /**
+     * Method to get a DigestUtils implementation
+     *
+     * @return a DigestUtils implementation
+     */
+    public DigestUtils getDigestUtils() {
+        return this.digestUtils;
+    }
+
+    /**
      * Method to get an ExecUtils implementation
      *
      * @return an ExecUtils implementation
      */
-    public ExecUtilsImpl getExecUtils() {
+    public ExecUtils getExecUtils() {
         return execUtils;
     }
 
@@ -448,8 +468,14 @@ public class Toolset {
         getLogger().error(message);
     }
 
-    public void error(String message, Object object) {
-        getLogger().error(message, object);
+    /**
+     * Method to log an error mesage and associated Throwable
+     *
+     * @param message
+     * @param t
+     */
+    public void error(String message, Throwable t) {
+        getLogger().error(message, t);
     }
 
     /**
