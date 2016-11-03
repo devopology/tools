@@ -452,7 +452,13 @@ public class Toolset {
      * @param message
      */
     public void banner(String message) {
-        banner(message, false);
+        if (null == startTimestamp) {
+            this.startTimestamp = System.currentTimeMillis();
+        }
+
+        info(BANNER_LINE);
+        info(message);
+        info(BANNER_LINE);
     }
 
     /**
@@ -482,7 +488,7 @@ public class Toolset {
         info(BANNER_LINE);
 
         if (true == extended) {
-            info("Total time: " + secondsFormat.format((float) (startTimestamp - endTimestamp) / 1000.0f));
+            info("Total time: " + secondsFormat.format((float) (endTimestamp - startTimestamp) / 1000.0f) + " s");
             info("Finished at: " + ISO8601DateFormat.format(new Date()));
             info("Final memory: " + usedMemoryString + "/" + totalMemoryString);
             info(BANNER_LINE);
