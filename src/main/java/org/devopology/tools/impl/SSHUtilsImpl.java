@@ -17,8 +17,10 @@
 package org.devopology.tools.impl;
 
 import ch.ethz.ssh2.Connection;
+import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 import org.devopology.tools.ExecResult;
+import org.devopology.tools.SSHUtils;
 import org.devopology.tools.Toolset;
 
 import java.io.BufferedReader;
@@ -29,7 +31,7 @@ import java.io.InputStreamReader;
 /**
  * Class to implement SSHUtilss
  */
-public class SSHUtilsImpl implements org.devopology.tools.SSHUtils {
+public class SSHUtilsImpl implements SSHUtils {
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
@@ -39,7 +41,52 @@ public class SSHUtilsImpl implements org.devopology.tools.SSHUtils {
         this.toolset = toolset;
     }
 
-    /**
+//    public SFTPv3Client getSFTPv3Client(String hostname, int port, String username, String password) throws IOException {
+//        Connection connection = null;
+//
+//        try {
+//            connection = new Connection(hostname, port);
+//            connection.connect();
+//
+//            boolean isAuthenticated = connection.authenticateWithPassword(username, password);
+//            if (isAuthenticated == false) {
+//                throw new IOException("sshExec() Exception : authentication failed.");
+//            }
+//
+//            return new SFTPv3Client(connection);
+//        }
+//        catch (Throwable t) {
+//            if (null != connection) {
+//                if (null != connection) {
+//                    try {
+//                        connection.close();
+//                    } catch (Throwable tt) {s
+//                        // DO NOTHING
+//                    }
+//                }
+//            }
+//
+//            throw new IOException(t);
+//        }
+//    }
+
+    /**s
+     * Method to execute a remote command via ssh
+     *
+     * @param hostname
+     * @param port
+     * @param username
+     * @param password
+     * @param command
+     * @return ExecResults
+     * @throws IOException
+     */
+    @Override
+    public ExecResult exec(String hostname, int port, String username, String password, String command) throws IOException {
+        return exec(hostname, port, username, password, new String[]{command});
+    }
+
+    /**s
      * Method to execute a remote command via ssh
      *
      * @param hostname
@@ -51,9 +98,9 @@ public class SSHUtilsImpl implements org.devopology.tools.SSHUtils {
      * @throws IOException
      */
     @Override
-    public ExecResult sshExec(String hostname, int port, String username, String password, String[] commands) throws IOException {
+    public ExecResult exec(String hostname, int port, String username, String password, String[] commands) throws IOException {
         Connection connection = null;
-        ch.ethz.ssh2.Session session = null;
+        Session session = null;
 
         try
         {

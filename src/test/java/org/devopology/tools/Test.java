@@ -93,8 +93,17 @@ public class Test extends Toolset {
         Exception e = new Exception();
         error("Test exception logging", e);
 
-        //ExecResult execResult = getSshUtils().sshExec("some.private.server", 22, "administrator", "somepassword", arguments("ls", "-la"));
-        //info(execResult.getOutput());
+        //ExecResult execResult = getSshUtils().sshExec("**REMOVED**", 22, "administrator", "**REMOVED**", arguments("ls", "-la"));
+        /// /info(execResult.getOutput());
+
+        //long fileOffset, byte[] src, int srcoff, int len)
+
+        String s = "This is a test";
+        byte [] bytes = s.getBytes("UTF-8");
+
+//        SFTPv3Client sftpClient = ((SSHUtilsImpl) getSSHUtils()).getSFTPv3Client("diamond.private", 22, "administrator", "R1ed~~~B2lue");
+//        SFTPv3FileHandle sftpFileHandle = sftpClient.createFile("/tmp/upload.txt");
+//        sftpClient.write(sftpFileHandle, 0, bytes, 0, bytes.length);
 
         banner("TESTING DONE", true);
     }

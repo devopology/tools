@@ -241,7 +241,7 @@ public class Toolset {
      * s
      * @return an SSHUtils implementation
      */
-    public SSHUtils getSshUtils() {
+    public SSHUtils getSSHUtils() {
         return sshUtils;
     }
 

@@ -27,9 +27,22 @@ public interface SSHUtils {
      * @param port
      * @param username
      * @param password
+     * @param command
+     * @return ExecResults
+     * @throws IOException
+     */
+    ExecResult exec(String hostname, int port, String username, String password, String command) throws IOException;
+
+    /**
+     * Method to execute a remote command via ssh
+     *
+     * @param hostname
+     * @param port
+     * @param username
+     * @param password
      * @param commands
      * @return ExecResults
      * @throws IOException
      */
-    ExecResult sshExec(String hostname, int port, String username, String password, String[] commands) throws IOException;
+    ExecResult exec(String hostname, int port, String username, String password, String[] commands) throws IOException;
 }
