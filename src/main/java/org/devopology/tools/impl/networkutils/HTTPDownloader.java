@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-public class Downloader {
+public class HTTPDownloader {
 
-    public File download(URL url, File dstFile) throws Exception {
+    public File downloadFileViaHTTP(URL url, File dstFile) throws Exception {
         CloseableHttpClient httpclient = HttpClients.custom()
                 .setRedirectStrategy(new LaxRedirectStrategy()) // adds HTTP REDIRECT support to GET and POST methods
                 .build();

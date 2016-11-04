@@ -6,7 +6,7 @@
  *  Author : Tony BenBrahim, Apr 16 '15 at 13:05
  */
 
-package org.devopology.tools.impl;
+package org.devopology.tools.impl.ziputils;
 
 import org.apache.commons.io.IOUtils;
 import org.devopology.tools.Toolset;
