@@ -23,4 +23,6 @@ public interface NetworkUtils {
     boolean canConnect(String hostname, int port) throws IOException;
 
     void downloadFileViaHTTP(String url, String filename) throws IOException;
+
+    void uploadFileViaSFTP(String hostname, int port, String username, String password, String sourceFilename, String destinationFilename) throws IOException;
 }

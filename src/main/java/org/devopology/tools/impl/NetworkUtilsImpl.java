@@ -16,8 +16,10 @@
 
 package org.devopology.tools.impl;
 
+import org.devopology.tools.NetworkUtils;
 import org.devopology.tools.Toolset;
 import org.devopology.tools.impl.networkutils.Downloader;
+import org.devopology.tools.impl.networkutils.SFTPUploader;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,12 +30,14 @@ import java.net.URL;
 /**
  * Class to implement NetworkUtils
  */
-public class NetworkUtilsImpl implements org.devopology.tools.NetworkUtils {
+public class NetworkUtilsImpl implements NetworkUtils {
 
     private Toolset toolset = null;
+    private SFTPUploader sftpUploader = null;
 
     public NetworkUtilsImpl(Toolset toolset) {
         this.toolset = toolset;
+        this.sftpUploader = new SFTPUploader();
     }
 
     /**
@@ -102,4 +106,21 @@ public class NetworkUtilsImpl implements org.devopology.tools.NetworkUtils {
             throw new IOException("downloadFileViaHTTP() Exception", t);
         }
     }
+
+    /**
+     * Method to upload a file via SFTP
+     *
+     * @param server
+     * @param port
+     * @param username
+     * @param password
+     * @param filename
+     * @param destinationFilename
+     * @throws IOException
+     */
+    public void uploadFileViaSFTP(String server, int port, String username, String password, String filename, String destinationFilename) throws IOException {
+        filename = toolset.absolutePath(filename);
+        sftpUploader.uploadFileViaSFTP(server, port, username, password, filename, destinationFilename);
+    }
+
 }
