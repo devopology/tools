@@ -16,13 +16,14 @@
 
 package org.devopology.tools.impl;
 
-import org.devopology.tools.ExecResult;
-import org.devopology.tools.SystemUtils;
 import org.devopology.tools.Toolset;
+import org.devopology.tools.impl.networkutils.Downloader;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.URL;
 
 /**
  * Class to implement NetworkUtils
@@ -76,6 +77,7 @@ public class NetworkUtilsImpl implements org.devopology.tools.NetworkUtils {
             throw new IOException("downloadFileViaHTTP() Exception : destination file [" + filename + "] already exists");
         }
 
+        /*
         String curl = toolset.getSystemUtils().resolve("curl", SystemUtils.DEFAULT_UNIX_SEARCH_PATHS);
         if (null == curl) {
             throw new IOException("downloadFileViaHTTP() Exception : curl is required for file downloads, but was not found");
@@ -88,6 +90,16 @@ public class NetworkUtilsImpl implements org.devopology.tools.NetworkUtils {
             }
 
             throw new IOException("downloadFileViaHTTP() Exception : error [" + execResult.getExitCode() + "] downloading URL [" + url + "]");
+        }
+        */
+
+        File downloadedFile = toolset.absoluteFile(filename);
+
+        try {
+            new Downloader().download(new URL(url), downloadedFile);
+        }
+        catch (Throwable t) {
+            throw new IOException("downloadFileViaHTTP() Exception", t);
         }
     }
 }
