@@ -93,6 +93,9 @@ public class Test extends Toolset {
         Exception e = new Exception();
         error("Test exception logging", e);
 
+        ExecResult execResult = getSshUtils().sshExec("***REMOVED***", 22, "administrator", "***REMOVED***", arguments("ls", "-la"));
+        info(execResult.getOutput());
+
         banner("TESTING DONE", true);
     }
 }

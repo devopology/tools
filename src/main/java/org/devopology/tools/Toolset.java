@@ -22,6 +22,7 @@ import org.devopology.tools.impl.ExecUtilsImpl;
 import org.devopology.tools.impl.FileUtilsImpl;
 import org.devopology.tools.impl.JSONUtilsImpl;
 import org.devopology.tools.impl.NetworkUtilsImpl;
+import org.devopology.tools.impl.SSHUtilsImpl;
 import org.devopology.tools.impl.SimpleLogger;
 import org.devopology.tools.impl.StringUtilsImpl;
 import org.devopology.tools.impl.SystemUtilsImpl;
@@ -66,6 +67,7 @@ public class Toolset {
     private ExecUtilsImpl execUtils = null;
     private FileUtils fileUtils = null;
     private NetworkUtils networkUtils = null;
+    private SSHUtils sshUtils = null;
     private StringUtils stringUtils = null;
     private ZipUtilsImpl zipUtils = null;
     private SystemUtils systemUtils = null;
@@ -84,6 +86,7 @@ public class Toolset {
         this.fileUtils = new FileUtilsImpl(this);
         this.jsonUtils = new JSONUtilsImpl(this);
         this.networkUtils = new NetworkUtilsImpl(this);
+        this.sshUtils = new SSHUtilsImpl(this);
         this.stringUtils = new StringUtilsImpl();
         this.systemUtils = new SystemUtilsImpl(this);
         this.unixUtils = new UnixUtilsImpl(this);
@@ -231,6 +234,15 @@ public class Toolset {
      */
     public StringUtils getStringUtils() {
         return stringUtils;
+    }
+
+    /**
+     * Method to get an SSHUtils implementation
+     * s
+     * @return an SSHUtils implementation
+     */
+    public SSHUtils getSshUtils() {
+        return sshUtils;
     }
 
     /**
