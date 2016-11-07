@@ -111,7 +111,6 @@ public class ExecUtilsImpl implements ExecUtils {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
             executor.setStreamHandler(streamHandler);
-
             executor.execute(commandLine, resultHandler);
             resultHandler.waitFor();
 
@@ -171,6 +170,7 @@ public class ExecUtilsImpl implements ExecUtils {
 
             ExecuteWatchdog watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
             Executor executor = new DefaultExecutor();
+            executor.setWorkingDirectory(new File(toolset.getCurrentDirectory().getPath()));
             executor.setWatchdog(watchdog);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
