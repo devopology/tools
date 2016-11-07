@@ -6,7 +6,7 @@
 
     <groupId>org.devopology</groupId>
     <artifactId>org.devopology.tools</artifactId>
-    <version>2.1.4-SNAPSHOT</version>
+    <version>2.1.5-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>tools</name>
     <description>Code to encapsulate common functionality for simple operations</description>
@@ -31,7 +31,7 @@
     <scm>
         <connection>scm:git:git://github.com/devopology/tools.git</connection>
         <developerConnection>scm:git:ssh://github.com/devopology/tools.git</developerConnection>
-        <url>https://github.com/devopology/tools/tree/2.1.4-SNAPSHOT</url>
+        <url>https://github.com/devopology/tools/tree/2.1.5-SNAPSHOT</url>
     </scm>
 
     <distributionManagement>
