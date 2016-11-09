@@ -6,7 +6,7 @@
 
     <groupId>org.devopology</groupId>
     <artifactId>org.devopology.tools</artifactId>
-    <version>2.1.5</version>
+    <version>2.2.0</version>
     <packaging>jar</packaging>
     <name>tools</name>
     <description>Code to encapsulate common functionality for simple operations</description>
@@ -31,7 +31,7 @@
     <scm>
         <connection>scm:git:git://github.com/devopology/tools.git</connection>
         <developerConnection>scm:git:ssh://github.com/devopology/tools.git</developerConnection>
-        <url>https://github.com/devopology/tools/tree/2.1.5</url>
+        <url>https://github.com/devopology/tools/tree/2.2.0</url>
     </scm>
 
     <distributionManagement>
@@ -109,26 +109,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.5.0</version>
-                <executions>
-                    <execution>
-                        <id>package-apidocs</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <mainClass>org.devopology.tools.ApidocsPackager</mainClass>
-                    <arguments>
-                        <argument>${project.basedir}</argument>
-                    </arguments>
-                </configuration>
             </plugin>
         </plugins>
     </build>

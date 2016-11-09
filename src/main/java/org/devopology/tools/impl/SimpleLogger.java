@@ -22,26 +22,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-
-/*
- * Copyright 2016 Doug Hoard
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
-package org.devopology.tools.impl;
-// Changed to allow prevent package namespace issues
 //package org.slf4j.impl;
+package org.devopology.tools.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.event.LoggingEvent;
@@ -53,12 +35,8 @@ import org.slf4j.spi.LocationAwareLogger;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.PrintStream;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
@@ -135,13 +113,13 @@ import java.util.Properties;
  * @author Robert Burrell Donkin
  * @author C&eacute;drik LIME
  */
-public class SimpleLogger extends MarkerIgnoringBase {
+public class SimpleLogger extends MarkerIgnoringBase implements ConfigurableLogger {
 
-    private static final long serialVersionUID = -632788891211436180L;
-    private static final String CONFIGURATION_FILE = "simplelogger.properties";
+    private final long serialVersionUID = -632788891211436180L;
+    //private static final String CONFIGURATION_FILE = "simplelogger.properties";
 
-    private static long START_TIME = System.currentTimeMillis();
-    private static Properties SIMPLE_LOGGER_PROPS = new Properties();
+    private long START_TIME = System.currentTimeMillis();
+    private Properties SIMPLE_LOGGER_PROPS = new Properties();
 
     private static final int LOG_LEVEL_TRACE = LocationAwareLogger.TRACE_INT;
     private static final int LOG_LEVEL_DEBUG = LocationAwareLogger.DEBUG_INT;
@@ -149,24 +127,23 @@ public class SimpleLogger extends MarkerIgnoringBase {
     private static final int LOG_LEVEL_WARN = LocationAwareLogger.WARN_INT;
     private static final int LOG_LEVEL_ERROR = LocationAwareLogger.ERROR_INT;
 
-    private static boolean INITIALIZED = false;
+    private boolean INITIALIZED = false;
 
-    private static int DEFAULT_LOG_LEVEL = LOG_LEVEL_INFO;
-    private static boolean SHOW_DATE_TIME = false;
-    private static String DATE_TIME_FORMAT_STR = null;
-    private static DateFormat DATE_FORMATTER = null;
-    private static boolean SHOW_THREAD_NAME = true;
-    private static boolean SHOW_LOG_NAME = true;
-    private static boolean SHOW_SHORT_LOG_NAME = false;
-    private static String LOG_FILE = "System.err";
-    private static PrintStream TARGET_STREAM = null;
-    private static boolean LEVEL_IN_BRACKETS = false;
-    private static String WARN_LEVEL_STRING = "WARN";
+    private int DEFAULT_LOG_LEVEL = LOG_LEVEL_INFO;
+    private boolean SHOW_DATE_TIME = false;
+    private String DATE_TIME_FORMAT_STR = null;
+    private DateFormat DATE_FORMATTER = null;
+    private boolean SHOW_THREAD_NAME = false;
+    private boolean SHOW_LOG_NAME = false;
+    private boolean SHOW_SHORT_LOG_NAME = false;
+    private String LOG_FILE = "System.err";
+    private PrintStream TARGET_STREAM = null;
+    private boolean LEVEL_IN_BRACKETS = true;
+    private String WARN_LEVEL_STRING = "WARN";
 
     /** All system properties used by <code>SimpleLogger</code> start with this prefix */
     public static final String SYSTEM_PREFIX = "org.slf4j.simpleLogger.";
 
-    public static final String MUTE = SYSTEM_PREFIX + "mute";
     public static final String DEFAULT_LOG_LEVEL_KEY = SYSTEM_PREFIX + "defaultLogLevel";
     public static final String SHOW_DATE_TIME_KEY = SYSTEM_PREFIX + "showDateTime";
     public static final String DATE_TIME_FORMAT_KEY = SYSTEM_PREFIX + "dateTimeFormat";
@@ -179,7 +156,7 @@ public class SimpleLogger extends MarkerIgnoringBase {
 
     public static final String LOG_KEY_PREFIX = SYSTEM_PREFIX + "log.";
 
-    private static String getStringProperty(String name) {
+    private String getStringProperty(String name) {
         String prop = null;
         try {
             prop = System.getProperty(name);
@@ -189,64 +166,14 @@ public class SimpleLogger extends MarkerIgnoringBase {
         return (prop == null) ? SIMPLE_LOGGER_PROPS.getProperty(name) : prop;
     }
 
-    private static String getStringProperty(String name, String defaultValue) {
+    private String getStringProperty(String name, String defaultValue) {
         String prop = getStringProperty(name);
         return (prop == null) ? defaultValue : prop;
     }
 
-    private static boolean getBooleanProperty(String name, boolean defaultValue) {
+    private boolean getBooleanProperty(String name, boolean defaultValue) {
         String prop = getStringProperty(name);
         return (prop == null) ? defaultValue : "true".equalsIgnoreCase(prop);
-    }
-
-    /**
-     * Method to initialize the logger with a Properties object
-     *
-     * @param properties
-     */
-    public static void init(Properties properties) {
-        INITIALIZED = false;
-        SIMPLE_LOGGER_PROPS = properties;
-        init();
-    }
-
-    // Initialize class attributes.
-    // Load properties file, if found.
-    // Override with system properties.
-    static void init() {
-        if (INITIALIZED) {
-            return;
-        }
-        INITIALIZED = true;
-
-        // Changed code to only load
-        if (null == SIMPLE_LOGGER_PROPS) {
-            SIMPLE_LOGGER_PROPS = new Properties();
-        }
-        //loadProperties();
-
-        String defaultLogLevelString = getStringProperty(DEFAULT_LOG_LEVEL_KEY, null);
-        if (defaultLogLevelString != null)
-            DEFAULT_LOG_LEVEL = stringToLevel(defaultLogLevelString);
-
-        SHOW_LOG_NAME = getBooleanProperty(SHOW_LOG_NAME_KEY, SHOW_LOG_NAME);
-        SHOW_SHORT_LOG_NAME = getBooleanProperty(SHOW_SHORT_LOG_NAME_KEY, SHOW_SHORT_LOG_NAME);
-        SHOW_DATE_TIME = getBooleanProperty(SHOW_DATE_TIME_KEY, SHOW_DATE_TIME);
-        SHOW_THREAD_NAME = getBooleanProperty(SHOW_THREAD_NAME_KEY, SHOW_THREAD_NAME);
-        DATE_TIME_FORMAT_STR = getStringProperty(DATE_TIME_FORMAT_KEY, DATE_TIME_FORMAT_STR);
-        LEVEL_IN_BRACKETS = getBooleanProperty(LEVEL_IN_BRACKETS_KEY, LEVEL_IN_BRACKETS);
-        WARN_LEVEL_STRING = getStringProperty(WARN_LEVEL_STRING_KEY, WARN_LEVEL_STRING);
-
-        LOG_FILE = getStringProperty(LOG_FILE_KEY, LOG_FILE);
-        TARGET_STREAM = computeTargetStream(LOG_FILE);
-
-        if (DATE_TIME_FORMAT_STR != null) {
-            try {
-                DATE_FORMATTER = new SimpleDateFormat(DATE_TIME_FORMAT_STR);
-            } catch (IllegalArgumentException e) {
-                Util.report("Bad date format in " + CONFIGURATION_FILE + "; will output relative time", e);
-            }
-        }
     }
 
     private static PrintStream computeTargetStream(String logFile) {
@@ -266,45 +193,19 @@ public class SimpleLogger extends MarkerIgnoringBase {
         }
     }
 
-    private static void loadProperties() {
-        // Add props from the resource simplelogger.properties
-        InputStream in = AccessController.doPrivileged(new PrivilegedAction<InputStream>() {
-            public InputStream run() {
-                ClassLoader threadCL = Thread.currentThread().getContextClassLoader();
-                if (threadCL != null) {
-                    return threadCL.getResourceAsStream(CONFIGURATION_FILE);
-                } else {
-                    return ClassLoader.getSystemResourceAsStream(CONFIGURATION_FILE);
-                }
-            }
-        });
-        if (null != in) {
-            try {
-                SIMPLE_LOGGER_PROPS.load(in);
-                in.close();
-            } catch (java.io.IOException e) {
-                // ignored
-            }
-        }
-    }
-
     /** The current log level */
     protected int currentLogLevel = LOG_LEVEL_INFO;
     /** The short name of this simple log instance */
     private transient String shortLogName = null;
 
-    public SimpleLogger(String name, Properties properties) {
-    // Changed to allow direct creation of the Logger
-    //SimpleLogger(String name)
+    public SimpleLogger(String name) {
         this.name = name;
+        this.currentLogLevel = LOG_LEVEL_INFO;
+        TARGET_STREAM = computeTargetStream("System.out");
+    }
 
-        String levelString = recursivelyComputeLevelString();
-        levelString = properties.getProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
-        if (levelString != null) {
-            this.currentLogLevel = stringToLevel(levelString);
-        } else {
-            this.currentLogLevel = DEFAULT_LOG_LEVEL;
-        }
+    public void setLogLevel(int logLevel) {
+        this.currentLogLevel = logLevel;
     }
 
     String recursivelyComputeLevelString() {
@@ -691,5 +592,4 @@ public class SimpleLogger extends MarkerIgnoringBase {
         FormattingTuple tp = MessageFormatter.arrayFormat(event.getMessage(), event.getArgumentArray(), event.getThrowable());
         log(levelInt, tp.getMessage(), event.getThrowable());
     }
-
 }

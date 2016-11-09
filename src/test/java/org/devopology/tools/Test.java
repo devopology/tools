@@ -17,6 +17,7 @@
 package org.devopology.tools;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.devopology.tools.impl.ConfigurableLogger;
 import org.junit.Assert;
 
 public class Test extends Toolset {
@@ -37,6 +38,7 @@ public class Test extends Toolset {
     }
 
     public void test() throws Exception {
+        getLogger().setLogLevel(ConfigurableLogger.LOG_LEVEL_TRACE);
         banner("TESTING");
 
         String rootPath = "/tmp/";
@@ -80,7 +82,7 @@ public class Test extends Toolset {
 
         String ls = getSystemUtils().resolve("ls", org.devopology.tools.SystemUtils.DEFAULT_UNIX_SEARCH_PATHS);
         String output = getExecUtils().execute(ls, null, 0).getOutput();
-        info("ls = [" + output + "]");
+        trace("ls = [" + output + "]");
 
         info("I am root = [" + getSystemUtils().isUser("root") + "]");
 

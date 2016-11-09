@@ -17,6 +17,7 @@
 package org.devopology.tools;
 
 import org.apache.commons.io.FilenameUtils;
+import org.devopology.tools.impl.ConfigurableLogger;
 import org.devopology.tools.impl.DigestUtilsImpl;
 import org.devopology.tools.impl.ExecUtilsImpl;
 import org.devopology.tools.impl.FileUtilsImpl;
@@ -28,7 +29,6 @@ import org.devopology.tools.impl.StringUtilsImpl;
 import org.devopology.tools.impl.SystemUtilsImpl;
 import org.devopology.tools.impl.UnixUtilsImpl;
 import org.devopology.tools.impl.ZipUtilsImpl;
-import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,8 +38,10 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 /**
  * Class to implement common methods
@@ -54,7 +56,8 @@ public class Toolset {
 
     private static SimpleLogger logger = null; //new SimpleLogger(CLASS_NAME);
 
-    private Properties properties = null;
+    private Map<String, String> properties = null;
+    private Map<String, Object> attributes = null;
 
     private Long startTimestamp = null;
     private Long endTimestamp = null;
@@ -78,7 +81,8 @@ public class Toolset {
      * Constructor
      */
     public Toolset() {
-        this.properties = new Properties();
+        this.properties = new LinkedHashMap<String, String>();
+        this.attributes = new HashMap<String, Object>();
 
         this.currentDirectory = new CurrentDirectory();
         this.digestUtils = new DigestUtilsImpl();
@@ -92,17 +96,7 @@ public class Toolset {
         this.unixUtils = new UnixUtilsImpl(this);
         this.zipUtils = new ZipUtilsImpl(this);
 
-        getProperties().setProperty("org.slf4j.simpleLogger.defaultLogLevel", "info");
-        getProperties().setProperty("org.slf4j.simpleLogger.showDateTime", "false");
-        getProperties().setProperty("org.slf4j.simpleLogger.showThreadName", "false");
-        getProperties().setProperty("org.slf4j.simpleLogger.showLogName", "false");
-        getProperties().setProperty("org.slf4j.simpleLogger.logFile", "System.out");
-        getProperties().setProperty("org.slf4j.simpleLogger.levelInBrackets", "true");
-        getProperties().setProperty("org.slf4j.simpleLogger.log.Sisu", "info");
-        getProperties().setProperty("org.slf4j.simpleLogger.warnLevelString", "WARNING");
-
-        logger = new SimpleLogger(CLASS_NAME, getProperties());
-        logger.init(getProperties());
+        logger = new SimpleLogger(CLASS_NAME);
 
         markStartTimestamp();
     }
@@ -160,16 +154,12 @@ public class Toolset {
         return getClass().getName();
     }
 
-    public Properties getProperties() {
-        return properties;
-    }
-
     /**
      * Method to get the slf4j Logger
      *
      * @return Logger
      */
-    public Logger getLogger() {
+    public ConfigurableLogger getLogger() {
         return logger;
     }
 
@@ -239,6 +229,7 @@ public class Toolset {
     /**
      * Method to get an SSHUtils implementation
      * s
+     *
      * @return an SSHUtils implementation
      */
     public SSHUtils getSSHUtils() {
@@ -328,13 +319,34 @@ public class Toolset {
     }
 
     /**
+     * Method to a set key  / value property
+     *
+     * @param key
+     * @param value
+     */
+    public void setProperty(String key, String value) {
+        properties.put(key, value);
+    }
+
+    /**
      * Method to get a property value based on key
      *
      * @param key
      * @return String
      */
     public String getProperty(String key) {
-        return properties.getProperty(key, null);
+        return getProperty(key, null);
+    }
+
+    /**
+     * Method to set a namespace / key / value property
+     *
+     * @param namespace
+     * @param key
+     * @param value
+     */
+    public void setProperty(String namespace, String key, String value) {
+        properties.put(namespace + "." + key, value);
     }
 
     /**
@@ -345,7 +357,105 @@ public class Toolset {
      * @return String
      */
     public String getProperty(String key, String defaultValue) {
-        return properties.getProperty(key, defaultValue);
+        String result = properties.get(key);
+        if (null == result) {
+            result = defaultValue;
+        }
+        return result;
+    }
+
+    /**
+     * Method to get a property value based on a namespace and a key
+     *
+     * @param namespace
+     * @param key
+     * @param defaultValue
+     * @return String
+     */
+    public String getProperty(String namespace, String key, String defaultValue) {
+        return getProperty(namespace + "." + key, defaultValue);
+    }
+
+    /**
+     * Method to get properties
+     *
+     * @return Map<String, String>
+     */
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    /**
+     * Method to set a key / value attribute
+     *
+     * @param key
+     * @param value
+     */
+    public void setAttribute(String key, Object value) {
+        attributes.put(key, value);
+    }
+
+    /**
+     * Method to set a namespace / key / value attribute
+     *
+     * @param namespace
+     * @param key
+     * @param value
+     */
+    public void setAttribute(String namespace, String key, Object value) {
+        attributes.put(namespace + "." + key, value);
+    }
+
+    /**
+     * Method to get an attribute based on a key
+     *
+     * @param key
+     * @return Object
+     */
+    public Object getAttribute(String key) {
+        return getAttribute(key, null);
+    }
+
+    /**
+     * Method to get an attribute base
+     * @param key
+     * @param defaultObject
+     * @return Object
+     */
+    public Object getAttribute(String key, Object defaultObject) {
+        Object result = attributes.get(key);
+        if (null == result) {
+            result = defaultObject;
+        }
+        return result;
+    }
+
+    /**
+     * Method to get an attribute based on a namespace / key
+     *
+     * @param namespace
+     * @param key
+     * @return Object
+     */
+    public Object getAttribute(String namespace, String key) {
+        return getAttribute(namespace, key, null);
+    }
+
+    /**
+     * Method to get an attribute based on a namespace / key
+     * returning the defaultObject is not found
+     *
+     * @param namespace
+     * @param key
+     * @param defaultObject
+     * @return
+     */
+    public Object getAttribute(String namespace, String key, Object defaultObject) {
+        Object result = attributes.get(namespace + "." + key);
+        if (null == result) {
+            result = defaultObject;
+        }
+        return result;
     }
 
     /**
