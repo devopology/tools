@@ -16,7 +16,6 @@
 
 package org.devopology.tools.impl;
 
-import org.devopology.tools.ExecResult;
 import org.devopology.tools.Toolset;
 import org.devopology.tools.UnixUtils;
 
@@ -31,22 +30,6 @@ public class UnixUtilsImpl implements UnixUtils {
 
     public UnixUtilsImpl(Toolset toolset) {
         this.toolset = toolset;
-    }
-
-    /**
-     * Method to get whoami
-     *
-     * @return String
-     * @throws IOException
-     */
-    public String whoami() throws IOException {
-        String whoami = toolset.getSystemUtils().resolve("whoami", DEFAULT_UNIX_SEARCH_PATHS);
-        if (null == whoami) {
-            throw new IOException("whoami() Exception : can't find whoami");
-        }
-
-        ExecResult execResult = toolset.getExecUtils().execute(whoami, null, 0);
-        return execResult.getOutput().trim();
     }
 
     /**
@@ -67,37 +50,5 @@ public class UnixUtilsImpl implements UnixUtils {
      */
     public String getLinuxVersion() throws IOException {
         return toolset.getFileUtils().readFileToString("/proc/version").trim();
-    }
-
-    /**
-     * Method to chmod a file
-     *
-     * @param path
-     * @param permissions
-     * @throws IOException
-     */
-    public void chmod(String path, String permissions) throws IOException {
-        String chmod = toolset.getSystemUtils().resolve("chmod", DEFAULT_UNIX_SEARCH_PATHS);
-        if (null == chmod) {
-            throw new IOException("chmod() Exception : can't find chmod");
-        }
-
-        toolset.getExecUtils().execute(chmod, toolset.arguments("u+x", path), 0);
-    }
-
-    /**
-     * Method to use systemctl
-     *
-     * @param command
-     * @param service
-     * @throws IOException
-     */
-    public void systemctl(String command, String service) throws IOException {
-        String systemctl = toolset.getSystemUtils().resolve("systemctl", DEFAULT_UNIX_SEARCH_PATHS);
-        if (null == systemctl) {
-            throw new IOException("systemctl() Exception : can't find systemctl");
-        }
-
-        toolset.getExecUtils().execute(systemctl, toolset.arguments(command, service), 0);
     }
 }

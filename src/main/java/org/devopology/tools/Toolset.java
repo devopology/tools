@@ -448,7 +448,7 @@ public class Toolset {
      * @param namespace
      * @param key
      * @param defaultObject
-     * @return
+     * @return Object
      */
     public Object getAttribute(String namespace, String key, Object defaultObject) {
         Object result = attributes.get(namespace + "." + key);

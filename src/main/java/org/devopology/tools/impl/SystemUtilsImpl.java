@@ -65,25 +65,13 @@ public class SystemUtilsImpl implements SystemUtils {
     }
 
     @Override
-    public String whoami() throws IOException {
-        return toolset.getUnixUtils().whoami();
-    }
-
-    @Override
-    public boolean isUser(String username) throws IOException {
-        return (username.equals(whoami()));
-    }
-
-    @Override
     public String resolve(String executable, String... paths) throws IOException {
-        for (int i=0; i<paths.length; i++)
-        {
+        for (int i=0; i<paths.length; i++) {
             File file = toolset.absoluteFile(paths[i] + File.separator + executable);
 
             if (file.exists() && file.isFile()) {
                 return file.getAbsolutePath();
             }
-
         }
         return null;
     }

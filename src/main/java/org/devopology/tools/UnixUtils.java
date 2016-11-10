@@ -37,30 +37,4 @@ public interface UnixUtils {
      * @throws IOException
      */
     public String getLinuxVersion() throws IOException;
-
-    /**
-     * Method to chmod a file
-     *
-     * @param path
-     * @param permissions
-     * @throws IOException
-     */
-    public void chmod(String path, String permissions) throws IOException;
-
-    /**
-     * Method to use systemctl
-     *
-     * @param command
-     * @param service
-     * @throws IOException
-     */
-    public void systemctl(String command, String service) throws IOException;
-
-    /**
-     * Method to get whoami
-     *
-     * @return String
-     * @throws IOException
-     */
-    public String whoami() throws IOException;
 }

@@ -20,6 +20,8 @@ import org.apache.commons.lang3.SystemUtils;
 import org.devopology.tools.impl.ConfigurableLogger;
 import org.junit.Assert;
 
+import static org.devopology.tools.SystemUtils.DEFAULT_UNIX_SEARCH_PATHS;
+
 public class Test extends Toolset {
 
     public static void main(String [] args) throws Exception {
@@ -77,14 +79,36 @@ public class Test extends Toolset {
         changeDirectory("..");
         Assert.assertTrue(getFileUtils().exists("TEST/test.txt"));
 
-        String username = getSystemUtils().whoami();
-        info("username = [" + username + "]");
+        String username = null;
+        String whoami = getSystemUtils().resolve("whoami", DEFAULT_UNIX_SEARCH_PATHS);
+        info("whoami = [" + whoami + "]");
 
-        String ls = getSystemUtils().resolve("ls", org.devopology.tools.SystemUtils.DEFAULT_UNIX_SEARCH_PATHS);
+        if (null != whoami) {
+            username = getExecUtils().execute(whoami).getOutput();
+            info("username = [" + username + "]");
+        }
+
+        String id = getSystemUtils().resolve("id", DEFAULT_UNIX_SEARCH_PATHS);
+        info("id = [" + id + "]");
+
+        if (null != id) {
+            String idOutput = getExecUtils().execute(id).getOutput();
+            info("idOutput = [" + idOutput + "]");
+            String[] idTokens = idOutput.split(" ");
+            for (int i = 0; i < idTokens.length; i++) {
+                info("idtokens[" + i + "] = [" + idTokens[i] + "]");
+                String[] subIdtokens = getStringUtils().split(idTokens[i], "=(),");
+                for (int j = 0; j < subIdtokens.length; j++) {
+                    info("subIdTokens[" + j + "] = [" + subIdtokens[j] + "]");
+                }
+            }
+        }
+
+        String ls = getSystemUtils().resolve("ls", DEFAULT_UNIX_SEARCH_PATHS);
         String output = getExecUtils().execute(ls, null, 0).getOutput();
         trace("ls = [" + output + "]");
 
-        info("I am root = [" + getSystemUtils().isUser("root") + "]");
+        info("I am root = [" + ("root".equals(username)) + "]");
 
         String filename = "www.devopology.org_index_html";
         getNetworkUtils().downloadFileViaHTTP("https://raw.githubusercontent.com/devopology/tools/master/README.md", filename);

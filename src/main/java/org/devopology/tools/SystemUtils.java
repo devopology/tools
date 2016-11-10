@@ -36,9 +36,5 @@ public interface SystemUtils {
 
     boolean isJavaVersionAtLeast(JavaVersion requiredVersion);
 
-    String whoami() throws IOException;
-
-    boolean isUser(String username) throws IOException;
-
     String resolve(String executable, String ... paths) throws IOException;
 }

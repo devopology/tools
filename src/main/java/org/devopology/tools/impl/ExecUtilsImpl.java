@@ -69,6 +69,17 @@ public class ExecUtilsImpl implements ExecUtils {
     }
 
     /**
+     * Mehthod to execute an executable
+     *
+     * @param executable
+     * @return ExecResult
+     * @throws IOException
+     */
+    public ExecResult execute(String executable) throws IOException {
+        return execute(executable, null);
+    }
+
+    /**
      * Method to execute an executable
      *
      * @param executable
@@ -76,8 +87,18 @@ public class ExecUtilsImpl implements ExecUtils {
      * @return ExecResult
      */
     @Override
-    public ExecResult execute(String executable, String[] arguments) throws IOException {
+    public ExecResult execute(String executable, String [] arguments) throws IOException {
         EXIT_CODE = 0;
+
+        if (null == executable) {
+            throw new IllegalArgumentException("executable is null");
+        }
+
+        executable = executable.trim();
+
+        if (executable.length() == 0) {
+            throw new IllegalArgumentException("executable is empty");
+        }
 
         try {
             executable = toolset.getCurrentDirectory().absolutePath(executable);
@@ -141,8 +162,18 @@ public class ExecUtilsImpl implements ExecUtils {
      * @return ExecResult
      */
     @Override
-    public ExecResult execute(String executable, String[] arguments, int expectedExitCode) throws IOException {
+    public ExecResult execute(String executable, String [] arguments, int expectedExitCode) throws IOException {
         EXIT_CODE = 0;
+
+        if (null == executable) {
+            throw new IllegalArgumentException("executable is null");
+        }
+
+        executable = executable.trim();
+
+        if (executable.length() == 0) {
+            throw new IllegalArgumentException("executable is empty");
+        }
 
         try {
             executable = toolset.getCurrentDirectory().absolutePath(executable);

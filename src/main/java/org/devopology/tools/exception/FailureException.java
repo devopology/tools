@@ -14,24 +14,20 @@
  *  limitations under the License.
  */
 
-package org.devopology.tools;
+package org.devopology.tools.exception;
 
-import java.io.IOException;
-import java.util.List;
+public class FailureException extends RuntimeException {
 
-public interface ExecUtils {
+    public FailureException(String message) {
+        super(message);
+    }
 
-    public String [] arguments(String... arguments);
+    public FailureException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
 
-    public String [] arguments(List<String> argumentList);
-
-    public ExecResult execute(String executable) throws IOException;
-
-    public ExecResult execute(String executable, String[] arguments) throws IOException;
-
-    public ExecResult execute(String executable, String[] arguments, int expectedExitCode) throws IOException;
-
-    public int exitCode();
-
-    public void checkExitCode(int expectedExitCode) throws IOException;
+    public FailureException(Throwable throwable) {
+        super(throwable);
+    }
 }
+
