@@ -136,18 +136,18 @@ public class ExecUtilsImpl implements ExecUtils {
             //toolset.info("execute() " + commandLine.toString());
 
             DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-
             ExecuteWatchdog watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
             DefaultExecutor defaultExecutor = new DefaultExecutor();
+
             defaultExecutor.setWorkingDirectory(new File(toolset.getCurrentDirectory().getPath()));
             defaultExecutor.setWatchdog(watchdog);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+
             defaultExecutor.setStreamHandler(streamHandler);
-
-
             defaultExecutor.execute(commandLine, environmentVariableMap, resultHandler);
+
             resultHandler.waitFor();
 
             ExecResultImpl result = new ExecResultImpl();
@@ -229,17 +229,18 @@ public class ExecUtilsImpl implements ExecUtils {
             //toolset.info("execute() " + commandLine.toString());
 
             DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-
             ExecuteWatchdog watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
             DefaultExecutor defaultExecutor = new DefaultExecutor();
+
             defaultExecutor.setWorkingDirectory(new File(toolset.getCurrentDirectory().getPath()));
             defaultExecutor.setWatchdog(watchdog);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
-            defaultExecutor.setStreamHandler(streamHandler);
 
+            defaultExecutor.setStreamHandler(streamHandler);
             defaultExecutor.execute(commandLine, environmentVariableMap, resultHandler);
+
             resultHandler.waitFor();
 
             ExecResultImpl result = new ExecResultImpl();

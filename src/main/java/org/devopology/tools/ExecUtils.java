@@ -23,22 +23,19 @@ import java.util.Map;
 public interface ExecUtils {
 
     /**
-     * Exit code of the last executable execution
-     */
-    /**
      * Method to convert a variable argument list into a an array
      *
      * @param arguments
      * @return String []
      */
-    public String [] arguments(String... arguments);
+    String [] arguments(String... arguments);
 
     /* Method to convert a list of Strings into an array
      *
      * @param arguments
      * @return String []
      */
-    public String [] arguments(List<String> argumentList);
+    String [] arguments(List<String> argumentList);
 
     /**
      * Mehthod to execute an executable
@@ -47,7 +44,7 @@ public interface ExecUtils {
      * @return ExecResult
      * @throws IOException
      */
-    public ExecResult execute(String executable) throws IOException;
+    ExecResult execute(String executable) throws IOException;
 
     /**
      * Method to execute an executable
@@ -56,7 +53,7 @@ public interface ExecUtils {
      * @param arguments
      * @return ExecResult
      */
-    public ExecResult execute(String executable, String [] arguments) throws IOException;
+    ExecResult execute(String executable, String [] arguments) throws IOException;
 
     /**
      * Method to execute an executable
@@ -65,7 +62,7 @@ public interface ExecUtils {
      * @param arguments
      * @return ExecResult
      */
-    public ExecResult execute(String executable, String [] arguments, Map<String, String> environmentVariableMap) throws IOException;
+    ExecResult execute(String executable, String [] arguments, Map<String, String> environmentVariableMap) throws IOException;
 
     /**
      * Method to execute an executable with an expected exit code
@@ -77,7 +74,7 @@ public interface ExecUtils {
      * @param expectedExitCode
      * @return ExecResult
      */
-    public ExecResult execute(String executable, String [] arguments, int expectedExitCode) throws IOException;
+    ExecResult execute(String executable, String [] arguments, int expectedExitCode) throws IOException;
 
     /**
      * Method to execute an executable with an expected exit code
@@ -90,21 +87,27 @@ public interface ExecUtils {
      * @param environmentVariableMap
      * @return ExecResult
      */
-    public ExecResult execute(String executable, String [] arguments, int expectedExitCode, Map<String, String> environmentVariableMap) throws IOException;
+    ExecResult execute(String executable, String [] arguments, int expectedExitCode, Map<String, String> environmentVariableMap) throws IOException;
 
     /**
-     * Method to get the exit code of the last execute command
+     * Method to get the exit code of the last executed command
      *
      * @return int
      */
-    public int exitCode();
+    int exitCode();
 
-    public void checkExitCode(int expectedExitCode) throws IOException;
+    /**
+     * Method to check the exit code of the last executed command against an expected value
+     *
+     * @param expectedExitCode
+     * @throws IOException
+     */
+    void checkExitCode(int expectedExitCode) throws IOException;
 
     /**
      * Method to get a copy of the System environment variable Map
      *
      * @return Map<String, String>
      */
-    public Map<String, String> getEnvironmentVariableMap();
+    Map<String, String> getEnvironmentVariableMap();
 }

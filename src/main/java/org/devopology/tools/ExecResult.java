@@ -26,7 +26,7 @@ public interface ExecResult {
      *
      * @return int
      */
-    public int getExitCode();
+    int getExitCode();
 
     /**
      * Get the content (output) from the execute call
@@ -34,7 +34,7 @@ public interface ExecResult {
      * @return String
      */
     @Deprecated
-    public String getContent();
+    String getContent();
 
     /**
      * Get the output from the execute call
@@ -42,7 +42,7 @@ public interface ExecResult {
      *
      * @return String
      */
-    public String getOutput();
+    String getOutput();
 
     /**
      * Get the output from the execute call
@@ -50,5 +50,5 @@ public interface ExecResult {
      * @param trim
      * @return String
      */
-    public String getOutput(boolean trim);
+    String getOutput(boolean trim);
 }

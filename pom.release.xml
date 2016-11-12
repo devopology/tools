@@ -70,7 +70,10 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.9.1</version>
                     <configuration>
-                        <additionalparam>-Xdoclint:none</additionalparam>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                        <sourceFileExcludes>
+                            <exclude>org/devopology/tools/impl/**</exclude>
+                        </sourceFileExcludes>
                     </configuration>
                     <executions>
                         <execution>

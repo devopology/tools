@@ -71,6 +71,9 @@
                     <version>2.9.1</version>
                     <configuration>
                         <additionalparam>-Xdoclint:none</additionalparam>
+                        <sourceFileExcludes>
+                            <exclude>org/devopology/tools/impl/**</exclude>
+                        </sourceFileExcludes>
                     </configuration>
                     <executions>
                         <execution>

@@ -26,7 +26,7 @@ public interface ZipUtils {
      * @param sourcePath
      * @param zipFilename
      */
-    public void zip(String sourcePath, String zipFilename) throws IOException;
+    void zip(String sourcePath, String zipFilename) throws IOException;
 
     /**
      * Method to unzip a file into a directory
@@ -34,7 +34,7 @@ public interface ZipUtils {
      * @param zipFilename
      * @param destinationPath
      */
-    public void unzip(String zipFilename, String destinationPath) throws IOException;
+    void unzip(String zipFilename, String destinationPath) throws IOException;
 
     /**
      * Method to unzip a file into a directory
@@ -43,5 +43,5 @@ public interface ZipUtils {
      * @param destinationPath
      * @param overwrite
      */
-    public void unzip(String zipFilename, String destinationPath, boolean overwrite) throws IOException;
+    void unzip(String zipFilename, String destinationPath, boolean overwrite) throws IOException;
 }

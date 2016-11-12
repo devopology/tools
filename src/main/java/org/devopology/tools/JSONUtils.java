@@ -27,9 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-/**
- * Created by Doug on 10/31/2016.
- */
 public interface JSONUtils {
 
     /**
@@ -70,7 +67,7 @@ public interface JSONUtils {
      * @param map
      * @return String
      */
-    public String toJSONString(Map map);
+    String toJSONString(Map map);
 
     /**
      * Method to convert a List to a JSON String
@@ -78,7 +75,7 @@ public interface JSONUtils {
      * @param list
      * @return String
      */
-    public String toJSONString(List list);
+    String toJSONString(List list);
 
     /**
      * Method to parse a JSON String into a JSONObject
@@ -87,7 +84,7 @@ public interface JSONUtils {
      * @return JSONObject
      * @throws IOException
      */
-    public JSONObject parseJSONObject(String json) throws IOException;
+    JSONObject parseJSONObject(String json) throws IOException;
 
     /**
      * Method to parse a JSON String as a Map
@@ -96,7 +93,7 @@ public interface JSONUtils {
      * @return Map
      * @throws IOException
      */
-    public Map parseMap(String json, ContainerFactory containerFactory) throws IOException;
+    Map parseMap(String json, ContainerFactory containerFactory) throws IOException;
 
     /**
      * Method to load and parse file's content as a JSONObject
@@ -104,7 +101,7 @@ public interface JSONUtils {
      * @param path
      * @return JSONObject
      */
-    public JSONObject loadJSONObject(String path) throws IOException;
+    JSONObject loadJSONObject(String path) throws IOException;
 
     /**
      * Method to parse a JSON String as a JSONArray
@@ -112,7 +109,7 @@ public interface JSONUtils {
      * @param json
      * @return JSONArray
      */
-    public JSONArray parseJSONArray(String json) throws IOException;
+    JSONArray parseJSONArray(String json) throws IOException;
 
     /**
      * Method to parse a JSON String as a List
@@ -122,7 +119,7 @@ public interface JSONUtils {
      * @return List
      * @throws IOException
      */
-    public List parseList(String json, ContainerFactory containerFactory) throws IOException;
+    List parseList(String json, ContainerFactory containerFactory) throws IOException;
 
     /**
      * Method to load and parse a file's content as a JSONArray
@@ -130,5 +127,5 @@ public interface JSONUtils {
      * @param path
      * @return JSONArray
      */
-    public JSONArray loadJSONArray(String path) throws IOException;
+    JSONArray loadJSONArray(String path) throws IOException;
 }

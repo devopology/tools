@@ -22,19 +22,65 @@ import java.io.IOException;
 
 public interface SystemUtils {
 
+    /**
+     * Default Unix search path array
+     */
     public final static String [] DEFAULT_UNIX_SEARCH_PATHS = UnixUtils.DEFAULT_UNIX_SEARCH_PATHS;
 
+    /**
+     * Method to get the Java home
+     *
+     * @return String
+     * @throws IOException
+     */
     String getJavaHome() throws IOException;
 
+    /**
+     * Method to get the Java temp directory
+     *
+     * @return String
+     * @throws IOException
+     */
     String getJavaIoTmpDir() throws IOException;
 
+    /**
+     * Method to get the user's directory
+     *
+     * @return String
+     * @throws IOException
+     */
     String getUserDir() throws IOException;
 
+    /**
+     * Method to get the user's home
+     *
+     * @return String
+     * @throws IOException
+     */
     String getUserHome() throws IOException;
 
+    /**
+     * Method to determine if Java is headless
+     *
+     * @return boolean
+     */
     boolean isJavaAwtHeadless();
 
+    /**
+     * Method to check if the Java version is a minimum
+     *
+     * @param requiredVersion
+     * @return boolean
+     */
     boolean isJavaVersionAtLeast(JavaVersion requiredVersion);
 
+    /**
+     * Method to resolve the absolute path to an executable based on the list of paths
+     *
+     * @param executable
+     * @param paths
+     * @return String
+     * @throws IOException
+     */
     String resolve(String executable, String ... paths) throws IOException;
 }

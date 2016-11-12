@@ -28,7 +28,7 @@ public interface UnixUtils {
      * @return String
      * @throws IOException
      */
-    public String getUnixVersion() throws IOException;
+    String getUnixVersion() throws IOException;
 
     /**
      * Method to get the full Linux version String
@@ -36,5 +36,5 @@ public interface UnixUtils {
      * @return String
      * @throws IOException
      */
-    public String getLinuxVersion() throws IOException;
+    String getLinuxVersion() throws IOException;
 }
