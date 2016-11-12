@@ -20,9 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 
-/**
- * Created by Doug on 11/3/2016.
- */
 public interface DigestUtils {
     MessageDigest getDigest(String algorithm);
 

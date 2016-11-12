@@ -17,7 +17,6 @@
 package org.devopology.tools;
 
 import org.apache.commons.io.FilenameUtils;
-import org.devopology.tools.impl.ConfigurableLogger;
 import org.devopology.tools.impl.DigestUtilsImpl;
 import org.devopology.tools.impl.ExecUtilsImpl;
 import org.devopology.tools.impl.FileUtilsImpl;

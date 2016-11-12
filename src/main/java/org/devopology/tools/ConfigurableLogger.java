@@ -14,21 +14,42 @@
  *  limitations under the License.
  */
 
-package org.devopology.tools.impl;
+package org.devopology.tools;
 
 import org.slf4j.Logger;
 import org.slf4j.spi.LocationAwareLogger;
 
-/**
- * Created by Doug on 11/8/2016.
- */
 public interface ConfigurableLogger extends Logger {
 
+    /**
+     * TRACE log level
+     */
     public static final int LOG_LEVEL_TRACE = LocationAwareLogger.TRACE_INT;
+
+    /**
+     * DEBUG log level
+     */
     public static final int LOG_LEVEL_DEBUG = LocationAwareLogger.DEBUG_INT;
+
+    /**
+     * INFO log level
+     */
     public static final int LOG_LEVEL_INFO = LocationAwareLogger.INFO_INT;
+
+    /**
+     * WARN log level
+     */
     public static final int LOG_LEVEL_WARN = LocationAwareLogger.WARN_INT;
+
+    /**
+     * ERROR log level
+     */
     public static final int LOG_LEVEL_ERROR = LocationAwareLogger.ERROR_INT;
 
+    /**
+     * Method to set the log level
+     *
+     * @param logLevel
+     */
     public void setLogLevel(int logLevel);
 }

@@ -25,6 +25,7 @@
 //package org.slf4j.impl;
 package org.devopology.tools.impl;
 
+import org.devopology.tools.ConfigurableLogger;
 import org.slf4j.Logger;
 import org.slf4j.event.LoggingEvent;
 import org.slf4j.helpers.FormattingTuple;
