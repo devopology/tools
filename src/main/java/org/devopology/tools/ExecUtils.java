@@ -18,20 +18,93 @@ package org.devopology.tools;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public interface ExecUtils {
 
+    /**
+     * Exit code of the last executable execution
+     */
+    /**
+     * Method to convert a variable argument list into a an array
+     *
+     * @param arguments
+     * @return String []
+     */
     public String [] arguments(String... arguments);
 
+    /* Method to convert a list of Strings into an array
+     *
+     * @param arguments
+     * @return String []
+     */
     public String [] arguments(List<String> argumentList);
 
+    /**
+     * Mehthod to execute an executable
+     *
+     * @param executable
+     * @return ExecResult
+     * @throws IOException
+     */
     public ExecResult execute(String executable) throws IOException;
 
-    public ExecResult execute(String executable, String[] arguments) throws IOException;
+    /**
+     * Method to execute an executable
+     *
+     * @param executable
+     * @param arguments
+     * @return ExecResult
+     */
+    public ExecResult execute(String executable, String [] arguments) throws IOException;
 
-    public ExecResult execute(String executable, String[] arguments, int expectedExitCode) throws IOException;
+    /**
+     * Method to execute an executable
+     *
+     * @param executable
+     * @param arguments
+     * @return ExecResult
+     */
+    public ExecResult execute(String executable, String [] arguments, Map<String, String> environmentVariableMap) throws IOException;
 
+    /**
+     * Method to execute an executable with an expected exit code
+     * If the exit code doesn't match the exepectedExitcode then
+     * and IOException is thrown
+     *
+     * @param executable
+     * @param arguments
+     * @param expectedExitCode
+     * @return ExecResult
+     */
+    public ExecResult execute(String executable, String [] arguments, int expectedExitCode) throws IOException;
+
+    /**
+     * Method to execute an executable with an expected exit code
+     * If the exit code doesn't match the exepectedExitcode then
+     * and IOException is thrown
+     *
+     * @param executable
+     * @param arguments
+     * @param expectedExitCode
+     * @param environmentVariableMap
+     * @return ExecResult
+     */
+    public ExecResult execute(String executable, String [] arguments, int expectedExitCode, Map<String, String> environmentVariableMap) throws IOException;
+
+    /**
+     * Method to get the exit code of the last execute command
+     *
+     * @return int
+     */
     public int exitCode();
 
     public void checkExitCode(int expectedExitCode) throws IOException;
+
+    /**
+     * Method to get a copy of the System environment variable Map
+     *
+     * @return Map<String, String>
+     */
+    public Map<String, String> getEnvironmentVariableMap();
 }
