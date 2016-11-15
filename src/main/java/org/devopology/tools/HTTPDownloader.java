@@ -42,7 +42,7 @@ public interface HTTPDownloader {
     /**
      * Method to get the request header map
      *
-     * @return
+     * @return Map<String, String>
      */
     public Map<String, String> getHeaderMap();
 
