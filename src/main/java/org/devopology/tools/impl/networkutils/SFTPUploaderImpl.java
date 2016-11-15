@@ -20,10 +20,18 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+import org.devopology.tools.SFTPUploader;
+import org.devopology.tools.Toolset;
 
 import java.io.IOException;
 
-public class SFTPUploader {
+public class SFTPUploaderImpl implements SFTPUploader {
+
+    private Toolset toolset = null;
+
+    public SFTPUploaderImpl(Toolset toolset) {
+        this.toolset = toolset;
+    }
 
     public void uploadFileViaSFTP(String hostname, int port, String username, String password, String sourceFilename, String destinationFilename) throws IOException {
         JSch ssh = null;
@@ -41,7 +49,7 @@ public class SFTPUploader {
             channel.connect();
 
             ChannelSftp sftp = (ChannelSftp) channel;
-            sftp.put(sourceFilename, destinationFilename);
+            sftp.put(toolset.absolutePath(sourceFilename), destinationFilename);
         }
         catch (Throwable t) {
             throw new IOException("downloadFileViaSFTP() Exception", t);

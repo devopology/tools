@@ -18,10 +18,12 @@ package org.devopology.tools.impl;
 
 import org.devopology.tools.HTTPDownloader;
 import org.devopology.tools.NetworkUtils;
+import org.devopology.tools.SFTPDownloader;
+import org.devopology.tools.SFTPUploader;
 import org.devopology.tools.Toolset;
 import org.devopology.tools.impl.networkutils.HTTPDownloaderImpl;
-import org.devopology.tools.impl.networkutils.SFTPDownloader;
-import org.devopology.tools.impl.networkutils.SFTPUploader;
+import org.devopology.tools.impl.networkutils.SFTPDownloaderImpl;
+import org.devopology.tools.impl.networkutils.SFTPUploaderImpl;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -41,8 +43,8 @@ public class NetworkUtilsImpl implements NetworkUtils {
     public NetworkUtilsImpl(Toolset toolset) {
         this.toolset = toolset;
         this.httpDownloader = new HTTPDownloaderImpl(toolset);
-        this.sftpDownloader = new SFTPDownloader(toolset);
-        this.sftpUploader = new SFTPUploader();
+        this.sftpDownloader = new SFTPDownloaderImpl(toolset);
+        this.sftpUploader = new SFTPUploaderImpl(toolset);
     }
 
     /**
@@ -111,28 +113,16 @@ public class NetworkUtilsImpl implements NetworkUtils {
      * @throws IOException
      */
     public void downloadFileViaSFTP(String hostname, int port, String username, String password, String filename, String destinationFilename) throws IOException {
-        downloadFileViaSFTP(hostname, port, username, password, filename, destinationFilename, true);
+        sftpDownloader.downloadFileViaSFTP(hostname, port, username, password, filename, destinationFilename);
     }
 
     /**
-     * Method to download a file via SFTP
-     * s
-     * @param hostname
-     * @param port
-     * @param username
-     * @param password
-     * @param filename
-     * @param destinationFilename
-     * @param overwrite
-     * @throws IOException
+     * Method to get an SFTP downloader
+     *
+     * @return
      */
-    public void downloadFileViaSFTP(String hostname, int port, String username, String password, String filename, String destinationFilename, boolean overwrite) throws IOException {
-        destinationFilename = toolset.absolutePath(destinationFilename);
-        if ((false == overwrite) && (toolset.getFileUtils().exists(destinationFilename))) {
-            throw new IOException("downloadFileViaHTTP() Exception : destination file [" + destinationFilename + "] already exists");
-        }
-
-        sftpDownloader.downloadFileViaSFTP(hostname, port, username, password, filename, destinationFilename);
+    public SFTPDownloader getSFTPDownloader() {
+        return sftpDownloader;
     }
 
     /**
@@ -149,5 +139,14 @@ public class NetworkUtilsImpl implements NetworkUtils {
     public void uploadFileViaSFTP(String hostname, int port, String username, String password, String filename, String destinationFilename) throws IOException {
         filename = toolset.absolutePath(filename);
         sftpUploader.uploadFileViaSFTP(hostname, port, username, password, filename, destinationFilename);
+    }
+
+    /**
+     * Method to an an SFTP uploader
+     *
+     * @return
+     */
+    public SFTPUploader getSFTPUploader() {
+        return sftpUploader;
     }
 }

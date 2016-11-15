@@ -20,15 +20,16 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+import org.devopology.tools.SFTPDownloader;
 import org.devopology.tools.Toolset;
 
 import java.io.IOException;
 
-public class SFTPDownloader {
+public class SFTPDownloaderImpl implements SFTPDownloader {
 
     private Toolset toolset = null;
 
-    public SFTPDownloader(Toolset toolset) {
+    public SFTPDownloaderImpl(Toolset toolset) {
         this.toolset = toolset;
     }
 

@@ -73,17 +73,9 @@ public interface NetworkUtils {
     void downloadFileViaSFTP(String hostname, int port, String username, String password, String filename, String destinationFilename) throws IOException;
 
     /**
-     * Method to download a file via SFTP
-     * s
+     * Method to get an SFTP downloader
      *
-     * @param hostname
-     * @param port
-     * @param username
-     * @param password
-     * @param filename
-     * @param destinationFilename
-     * @param overwrite
-     * @throws IOException
+     * @return SFTPDownloader
      */
-    void downloadFileViaSFTP(String hostname, int port, String username, String password, String filename, String destinationFilename, boolean overwrite) throws IOException;
+    SFTPDownloader getSFTPDownloader();
 }
