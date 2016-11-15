@@ -70,6 +70,12 @@ public class HTTPDownloaderImpl implements HTTPDownloader {
         try {
             File file = toolset.absoluteFile(filename);
             HttpGet get = new HttpGet(url.toURI());
+
+            Map<String, String> headerMap = getHeaderMap();
+            for (String name : headerMap.keySet()) {
+                get.setHeader(name, headerMap.get(name));
+            }
+
             get.setHeader(HttpHeaders.USER_AGENT, userAgent);
 
             httpclient.execute(get, new FileDownloadResponseHandler(file));
