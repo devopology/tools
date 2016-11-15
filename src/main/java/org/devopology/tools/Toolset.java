@@ -31,6 +31,7 @@ import org.devopology.tools.impl.ZipUtilsImpl;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.text.DecimalFormat;
@@ -41,6 +42,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.TreeMap;
 
 /**
  * Class to implement common methods
@@ -315,6 +318,25 @@ public class Toolset {
      */
     public String canonicalPath(String path) throws IOException {
         return absoluteFile(path).getCanonicalPath();
+    }
+
+    /**
+     * Method to load a Properties file
+     *
+     * @param filename
+     * @return Map<String, String>
+     * @throws Exception
+     */
+    public static Map<String, String> loadProperties(String filename) throws Exception {
+        Properties properties = new Properties();
+        properties.load(new FileInputStream(filename));
+
+        Map<String, String> result = new TreeMap<String, String>();
+        for (Map.Entry entry : properties.entrySet()) {
+            result.put((String) entry.getKey(), (String) entry.getValue());
+        }
+
+        return result;
     }
 
     /**

@@ -39,6 +39,13 @@ public interface NetworkUtils {
     void downloadFileViaHTTP(String url, String filename) throws IOException;
 
     /**
+     * Method to get the HTTP downloader
+     *
+     * @return HTTPDownloader
+     */
+    HTTPDownloader getHTTPDownloader();
+
+    /**
      * Method to upload a file via SFTP
      *
      * @param hostname

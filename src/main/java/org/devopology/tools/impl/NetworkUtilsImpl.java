@@ -16,13 +16,13 @@
 
 package org.devopology.tools.impl;
 
+import org.devopology.tools.HTTPDownloader;
 import org.devopology.tools.NetworkUtils;
 import org.devopology.tools.Toolset;
-import org.devopology.tools.impl.networkutils.HTTPDownloader;
+import org.devopology.tools.impl.networkutils.HTTPDownloaderImpl;
 import org.devopology.tools.impl.networkutils.SFTPDownloader;
 import org.devopology.tools.impl.networkutils.SFTPUploader;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -34,13 +34,13 @@ import java.net.URL;
 public class NetworkUtilsImpl implements NetworkUtils {
 
     private Toolset toolset = null;
-    private HTTPDownloader httpDownloader = null;
+    private HTTPDownloaderImpl httpDownloader = null;
     private SFTPDownloader sftpDownloader = null;
     private SFTPUploader sftpUploader = null;
 
     public NetworkUtilsImpl(Toolset toolset) {
         this.toolset = toolset;
-        this.httpDownloader = new HTTPDownloader();
+        this.httpDownloader = new HTTPDownloaderImpl(toolset);
         this.sftpDownloader = new SFTPDownloader(toolset);
         this.sftpUploader = new SFTPUploader();
     }
@@ -75,6 +75,15 @@ public class NetworkUtilsImpl implements NetworkUtils {
     }
 
     /**
+     * Method to get the HTTP downloader
+     *
+     * @return HTTPDownloader
+     */
+    public HTTPDownloader getHTTPDownloader() {
+        return httpDownloader;
+    }
+
+    /**
      * Method to downloasd a file via HTTP/HTTPS
      *
      * @param url
@@ -87,28 +96,7 @@ public class NetworkUtilsImpl implements NetworkUtils {
             throw new IOException("downloadFileViaHTTP() Exception : destination file [" + filename + "] already exists");
         }
 
-        /*
-        String curl = toolset.getSystemUtils().resolve("curl", SystemUtils.DEFAULT_UNIX_SEARCH_PATHS);
-        if (null == curl) {
-            throw new IOException("downloadFileViaHTTP() Exception : curl is required for file downloads, but was not found");
-        }
-
-        ExecResult execResult = toolset.getExecUtils().execute(curl, toolset.arguments("-s", "-o", toolset.absolutePath(filename), url));
-        if (0 != execResult.getExitCode()) {
-            if (toolset.getFileUtils().exists(filename)) {
-                toolset.getFileUtils().deleteQuietly(filename);
-            }
-
-            throw new IOException("downloadFileViaHTTP() Exception : error [" + execResult.getExitCode() + "] downloading URL [" + url + "]");
-        }
-        */
-
-        try {
-            httpDownloader.downloadFileViaHTTP(new URL(url), new File(filename));
-        }
-        catch (Throwable t) {
-            throw new IOException("downloadFileViaHTTP() Exception", t);
-        }
+        httpDownloader.downloadFileViaHTTP(new URL(url), toolset.absolutePath(filename));
     }
 
     /**

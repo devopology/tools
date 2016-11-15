@@ -56,15 +56,6 @@ public interface ExecUtils {
     ExecResult execute(String executable, String [] arguments) throws IOException;
 
     /**
-     * Method to execute an executable
-     *
-     * @param executable
-     * @param arguments
-     * @return ExecResult
-     */
-    ExecResult execute(String executable, String [] arguments, Map<String, String> environmentVariableMap) throws IOException;
-
-    /**
      * Method to execute an executable with an expected exit code
      * If the exit code doesn't match the exepectedExitcode then
      * and IOException is thrown
@@ -75,19 +66,6 @@ public interface ExecUtils {
      * @return ExecResult
      */
     ExecResult execute(String executable, String [] arguments, int expectedExitCode) throws IOException;
-
-    /**
-     * Method to execute an executable with an expected exit code
-     * If the exit code doesn't match the exepectedExitcode then
-     * and IOException is thrown
-     *
-     * @param executable
-     * @param arguments
-     * @param expectedExitCode
-     * @param environmentVariableMap
-     * @return ExecResult
-     */
-    ExecResult execute(String executable, String [] arguments, int expectedExitCode, Map<String, String> environmentVariableMap) throws IOException;
 
     /**
      * Method to get the exit code of the last executed command
@@ -103,6 +81,13 @@ public interface ExecUtils {
      * @throws IOException
      */
     void checkExitCode(int expectedExitCode) throws IOException;
+
+    /**
+     * Method to set a copy of the
+     *
+     * @param environmentVariableMap
+     */
+    void setEnvironmentVariableMap(Map<String, String> environmentVariableMap);
 
     /**
      * Method to get a copy of the System environment variable Map

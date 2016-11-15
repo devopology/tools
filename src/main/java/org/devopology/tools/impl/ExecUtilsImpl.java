@@ -44,6 +44,8 @@ public class ExecUtilsImpl implements ExecUtils {
      */
     protected static int EXIT_CODE = 0;
 
+    private Map<String, String> environmentVariableMap = null;
+
     public ExecUtilsImpl(Toolset toolset) {
         this.toolset = toolset;
     }
@@ -89,18 +91,6 @@ public class ExecUtilsImpl implements ExecUtils {
      */
     @Override
     public ExecResult execute(String executable, String [] arguments) throws IOException {
-        return execute(executable, arguments, getEnvironmentVariableMap());
-    }
-
-    /**
-     * Method to execute an executable
-     *
-     * @param executable
-     * @param arguments
-     * @return ExecResult
-     */
-    @Override
-    public ExecResult execute(String executable, String [] arguments, Map<String, String> environmentVariableMap) throws IOException {
         EXIT_CODE = 0;
 
         if (null == executable) {
@@ -146,7 +136,7 @@ public class ExecUtilsImpl implements ExecUtils {
             PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
 
             defaultExecutor.setStreamHandler(streamHandler);
-            defaultExecutor.execute(commandLine, environmentVariableMap, resultHandler);
+            defaultExecutor.execute(commandLine, getEnvironmentVariableMap(), resultHandler);
 
             resultHandler.waitFor();
 
@@ -178,22 +168,6 @@ public class ExecUtilsImpl implements ExecUtils {
      */
     @Override
     public ExecResult execute(String executable, String [] arguments, int expectedExitCode) throws IOException {
-        return execute(executable, arguments, expectedExitCode, getEnvironmentVariableMap());
-    }
-
-    /**
-     * Method to execute an executable with an expected exit code
-     * If the exit code doesn't match the exepectedExitcode then
-     * and IOException is thrown
-     *
-     * @param executable
-     * @param arguments
-     * @param expectedExitCode
-     * @param environmentVariableMap
-     * @return ExecResult
-     */
-    @Override
-    public ExecResult execute(String executable, String [] arguments, int expectedExitCode, Map<String, String> environmentVariableMap) throws IOException {
         EXIT_CODE = 0;
 
         if (null == executable) {
@@ -239,7 +213,7 @@ public class ExecUtilsImpl implements ExecUtils {
             PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
 
             defaultExecutor.setStreamHandler(streamHandler);
-            defaultExecutor.execute(commandLine, environmentVariableMap, resultHandler);
+            defaultExecutor.execute(commandLine, getEnvironmentVariableMap(), resultHandler);
 
             resultHandler.waitFor();
 
@@ -285,12 +259,27 @@ public class ExecUtilsImpl implements ExecUtils {
     }
 
     /**
+     * Method to set a copy of the
+     *
+     * @param environmentVariableMap
+     */
+    @Override
+    public void setEnvironmentVariableMap(Map<String, String> environmentVariableMap) {
+        this.environmentVariableMap = environmentVariableMap;
+    }
+
+    /**
      * Method to get a copy of the System environment variable Map
      *
      * @return Map<String, String>
      */
     @Override
     public Map<String, String> getEnvironmentVariableMap() {
-        return new HashMap<String, String>(System.getenv());
+        Map<String, String> result = environmentVariableMap;
+        if (null == result) {
+            environmentVariableMap = new HashMap<String, String>(System.getenv());
+            result = environmentVariableMap;
+        }
+        return result;
     }
 }
